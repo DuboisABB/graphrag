@@ -37,7 +37,11 @@ __blobstorage*.json
 __blobstorage__/
 
 # Getting started example
-ragtest/
+cache/
+ragtest/output/
+ragtest/prompts/
+ragtest/input/
+logs/
 .ragtest/
 .pipelines
 .pipeline
