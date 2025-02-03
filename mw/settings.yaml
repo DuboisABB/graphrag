@@ -50,8 +50,8 @@ input:
   file_pattern: ".*\\.txt$"
 
 chunks:
-  size: 1200
-  overlap: 100
+  size: 4000
+  overlap: 0
   group_by_columns: [id]
 
 ### Storage settings ###
@@ -81,8 +81,9 @@ update_index_storage:
 skip_workflows: []
 
 entity_extraction:
-  prompt: "prompts/entity_extraction.txt"
-  entity_types: [organization,person,geo,event]
+  prompt: "prompts/entity_extraction_MW.txt"
+  #prompt: "prompts/entity_extraction_original.txt"
+  entity_types: [QUOTE_ID,APPLICATION_NAME,APPLICATION_COMPLEXITY,CELL,DETECTOR,SOURCE,LENS,FILTER,CHEMICAL]
   max_gleanings: 1
 
 summarize_descriptions:
@@ -96,7 +97,7 @@ claim_extraction:
   max_gleanings: 1
 
 community_reports:
-  prompt: "prompts/community_report.txt"
+  prompt: "prompts/community_report_MW.txt"
   max_length: 2000
   max_input_length: 8000
 
@@ -104,14 +105,14 @@ cluster_graph:
   max_cluster_size: 10
 
 embed_graph:
-  enabled: false # if true, will generate node2vec embeddings for nodes
+  enabled: true # if true, will generate node2vec embeddings for nodes
 
 umap:
-  enabled: false # if true, will generate UMAP embeddings for nodes (embed_graph must also be enabled)
+  enabled: true # if true, will generate UMAP embeddings for nodes (embed_graph must also be enabled)
 
 snapshots:
   graphml: true
-  embeddings: false
+  embeddings: true
   transient: false
 
 ### Query settings ###

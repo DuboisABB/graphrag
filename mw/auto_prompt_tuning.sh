@@ -1,0 +1,1 @@
+python -m graphrag prompt-tune --root ~/graphrag/mw --output ~/graphrag/mw/prompts --config ~/graphrag/mw/settings.yaml --max-tokens 20000 --chunk-size 1000 --k 100 --discover-entity-types --domain 'similarity classification of process photometer applications'

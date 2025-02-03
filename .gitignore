@@ -41,6 +41,8 @@ cache/
 ragtest/output/
 ragtest/prompts/
 ragtest/input/
+mw/output/
+mw/input/
 logs/
 .ragtest/
 .pipelines

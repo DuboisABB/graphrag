@@ -1,0 +1,313 @@
+-Goal-
+Given a YAML file that is relevant to this activity and a list of entity types, identify all entities of those types from the text and all relationships among the identified entities.
+
+-Steps-
+1. Identify all entities. For each identified entity, extract the following information:
+- entity_name: Name of the entity, capitalized
+- entity_type: One of the following types: [QUOTE_ID,APPLICATION_NAME,APPLICATION_COMPLEXITY,CELL,DETECTOR,SOURCE,LENS,FILTER,CHEMICAL]
+- entity_description: Comprehensive description of the entity's attributes and activities
+- Instructions for type CHEMICAL: For these chemical stream entities, the entity name should follow this pattern: <Name> - <Type> - <Measurement specification1> - <Measurement specification2>, etc
+  Here are how the different chemical characteristics should be translated to form part of the entity names:
+    Type: Measurement -> MEAS
+	Type: Matrix -> MATRIX
+	Type: Matrix or Interferer -> MATRIX_OR_INT
+    Nominal_Concentration -> NOM
+    Max_Concentration -> MAX
+    Quoted_Max_Measurement_Concentration -> QUOTE MAX
+    Desired_Measurement_Repeatability -> REPEAT
+  Examples:
+    WATER - MEAS - 0.0006 NOM - 0.01 MAX - 0.01 QUOTE MAX - 1.0 REPEAT
+    DIMETHYL SULFOXIDE - MATRIX_OR_INT - 10 NOM - 100 MAX
+	1,2-DICHLOROETHANE - MATRIX - 99.9 NOM - 100.0 MAX
+- Instructions for CELL: form the name using this pattern:  CELL - <Heating_Mode> - <Temperature> ºC - <Lenght> - <Material> - <Window> - <Pressure> P
+  Examples:
+  CELL - ELECTRIC - 50 ºC - 2.0 MM - HAST C - SAPPHIRE - ATM P
+- Instructions for DETECTOR: always use the prefix DET, then a dash, then the name of the entity. For example: DET - UV - HIGH GAIN
+- Instructions for SOURCE: always use the prefix SRC, then a dash, then the name of the entity. For example: SRC - UV - LED
+- Instructions for LENS: always use the prefix LENS, then a dash, then the name of the entity. For example: LENS - SIO2
+- Instructions for FILTER: always use the prefix FILT, then a dash, then wavelength, a dash, the Chem, a dash and finally the role. If some property is missing, ignore it and removed its associated dash. 
+  For example: 
+  FILT - 3.71 - H2O - REF
+  FILT - 3.71 - REF
+1.1 MANDATORY: Format each entity as ("entity"<|><entity_name><|><entity_type><|><entity_description>)
+
+2. From the entities identified in step 1, identify all pairs of (source_entity, target_entity) that are related to each other (deduct the relationship from the YAML file structure).
+For each pair of related entities, extract the following information:
+- source_entity: name of the source entity, as identified in step 1
+- target_entity: name of the target entity, as identified in step 1
+- relationship_description: explanation as to why you think the source entity and the target entity are related to each other
+- relationship_strength: an integer score between 1 to 10, indicating strength of the relationship between the source entity and target entity. Here are some explicit strenghts to use:
+  - DETECTOR <-> QUOTE_ID : 8
+  - CELL <-> QUOTE_ID : 5
+  - LENS <-> QUOTE_ID : 5
+  - SOURCE <-> QUOTE_ID : 8
+  - FILTER <-> QUOTE_ID : 8
+  - CHEMICAL <-> QUOTE_ID : 10 if Meas or Matrix, 7 otherwise
+  - APPLICATION_COMPLEXITY <-> QUOTE_ID: 10
+  - APPLICATION_NAME <-> QUOTE_ID: 10
+- Use the YAML hierarchy to create the relationships. The top level is the Quote_ID. If there are no entities for a certain level, skip it (like Hardware_Config, Stream and Filter_Wheel should be skipped). For example:
+  - Create a relationship between each FILTER and the QUOTE_ID (skipping Filter_Wheel and Hardware_Config)
+  - Create a relationship between CELL and the QUOTE_ID.
+  - Create a relationship between a CHEMICAL and the QUOTE_ID. If type MEAS, make the strenght 10. If the CHEMICAL has a relationship with a FILTER, also make this relationship 10. Otherwise make it less strenght.
+  - Attempt to create relationships between CHEMICAL and FILTER. For example, FILT - 2.55 - CH3I - MEAS would have a relationship with the CHEMICAL - METHYL IODIDE. The chemical names will not necessarily match but use your knowledge of chemistry to make the proper associations. Rate the strenght according to your confidence in the chemical match. Sometimes the role of the filter and the chemical type will not match but the chemical name will match. In these cases, still add a relationship but lower the strenght.
+- Don't create relationships between LENS, DETECTOR, SOURCE and CELL.
+2.1 MANDATORY: Format each relationship as ("relationship"<|><source_entity><|><target_entity><|><relationship_description><|><relationship_strength>)
+
+3. If the Application Name is not specified in the YAML file, now is the time to create one entity of type APPLICATION_NAME and add a relationship to QUOTE_ID. For its name, it should be <measurement(s)> in <matrix>, for example: Methyl iodide in CO, Water in EDC, Water in VCM or Chlorine in HCl. For the application name entity DESCRIPTION, be exhaustive and list the main chemicals in the stream (i.e. the ones related to a FILTER), their type and concentration spec, the APPLICATION_COMPLEXITY, the CELL, DETECTOR and SOURCE. Sometimes the application name can go beyond the chemicals and be specifica to the application. For example, in Maleic Anhydride Synthesis, Maleic anhydride is produced by vapor-phase oxidation of n-butane. So Maleic Anhydride Reactor Inlet could be the application name if we have n-Butane and Water as measurements in a Nitrogen and Oxygen matrix. Maleic Anhydride Reactor Outlet could be the name if we have Maleic anhydride, n-Butane, CO and CO2 as measurements in a large Nitrogen matrix. You are allowed to use your expert chemistry knowledge to derive these names.
+
+4. Return output in English as a single list of all the entities and relationships identified in steps 1 and 2. Use ## as the list delimiter. NO EXPLANATION. NO TRAILING SPACES. FOLLOW THE FORMAT EXPLAINED IN 1.1 and 2.1.
+
+5. When finished, output <|COMPLETE|>.
+
+
+######################
+-Examples-
+######################
+
+-------------------------
+Example 1:
+
+text:
+Quote_ID: A40545.2-9
+Application_Complexity: 1 Comp / No Int
+Hardware_Config:
+  Cell:
+    Heating_Mode: Electric
+    Length: 1 M
+    Material: 316 SS
+    Pressure: Atm
+    Temperature: 50
+    Window: Sapphire
+  Detector: UV w/SF
+  Source: UV
+  Lens: CaF2
+  Filters:
+  - Wavelength: 3.6
+    Role: Ref
+  - Wavelength: 2.55
+    Chem: CH3I 
+    Role: Meas
+  - Wavelength: 3.6
+    Role: Meas
+  - Wavelength: 2.55
+    Role: Meas
+Streams:
+- Stream Number: 1
+  Chemicals:
+  - Name: Carbon monoxide
+    Type: Matrix or Interferer
+    Nominal_Concentration: 71.5
+  - Name: Nitrogen
+    Type: Matrix or Interferer
+    Nominal_Concentration: 9.5
+  - Name: Carbon dioxide
+    Type: Matrix or Interferer
+    Nominal_Concentration: 4.3
+  - Name: Methyl iodide
+    Type: Measurement
+    Nominal_Concentration: 0.002
+    Quoted_Max_Measurement_Concentration: 0.03
+  - Name: Hydrogen
+    Type: Matrix or Interferer
+    Nominal_Concentration: 12.5
+  - Name: Methane
+    Type: Matrix or Interferer
+    Nominal_Concentration: 0.6
+------------------
+output:
+("entity"<|>A40545.2-9<|>QUOTE_ID<|>The quote ID is A40545.2-9.)
+##
+("entity"<|>1 COMP NO INT<|>APPLICATION_COMPLEXITY<|>The application complexity is 1 component and no interferer.)
+##
+("entity"<|>METHYL IODIDE IN CO<|>APPLICATION_NAME<|>This application measures Methyl iodide (0.002 NOM, 0.03 QUOTE MAX) in a matrix of Carbon monoxide (71.5 NOM), Nitrogen (9.5 NOM), Carbon dioxide (4.3 NOM), Hydrogen (12.5 NOM) and Methane (0.6 NOM). The application complexity is 1 Comp / No Int. The cell is electric heated at 50 ºC, length 1 M, material 316 SS, window Sapphire, pressure Atm. The detector is UV w/SF and the source is UV.)
+##
+("entity"<|>CELL - ELECTRIC - 50 ºC - 1 M - 316 SS - SAPPHIRE - ATM P<|>CELL<|>A cell with electric heating mode, temperature of 50 degrees Celsius, length 1 M, material 316 SS, window Sapphire, and pressure Atm.)
+##
+("entity"<|>DET - UV W/SF<|>DETECTOR<|>UV w/SF is the detector used in the instrument.)
+##
+("entity"<|>SRC - UV<|>SOURCE<|>UV is the light source used in the instrument.)
+##
+("entity"<|>LENS - CAF2<|>LENS<|>CaF2 is the lens material used in the instrument.)
+##
+("entity"<|>FILT - 3.6 - REF<|>FILTER<|>3.6 - Ref is one of the filters used in the filter wheel.)
+##
+("entity"<|>FILT - 2.55 - CH3I - MEAS<|>FILTER<|>2.55 - CH3I - Meas is one of the filters used in the filter wheel.)
+##
+("entity"<|>FILT - 3.6 - MEAS<|>FILTER<|>3.6 - Meas is one of the filters used in the filter wheel.)
+##
+("entity"<|>FILT - 2.55 - MEAS<|>FILTER<|>2.55 - Meas is one of the filters used in the filter wheel.)
+##
+("entity"<|>CARBON MONOXIDE - MATRIX_OR_INT - 71.5 NOM<|>CHEMICAL<|>Carbon monoxide is a matrix or interferer with nominal concentration of 71.5.)
+##
+("entity"<|>NITROGEN - MATRIX_OR_INT - 9.5 NOM<|>CHEMICAL<|>Nitrogen is a matrix or interferer with nominal concentration of 9.5.)
+##
+("entity"<|>CARBON DIOXIDE - MATRIX_OR_INT - 4.3 NOM<|>CHEMICAL<|>Carbon dioxide is a matrix or interferer with nominal concentration of 4.3.)
+##
+("entity"<|>METHYL IODIDE - MEAS - 0.002 NOM - 0.03 QUOTE MAX<|>CHEMICAL<|>Methyl iodide is a measurement chemical with a nominal concentration of 0.002 and quoted max measurement concentration of 0.03.)
+##
+("entity"<|>HYDROGEN - MATRIX_OR_INT - 12.5 NOM<|>CHEMICAL<|>Hydrogen is a matrix or interferer with nominal concentration of 12.5.)
+##
+("entity"<|>METHANE - MATRIX_OR_INT - 0.6 NOM<|>CHEMICAL<|>Methane is a matrix or interferer with nominal concentration of 0.6.)
+##
+("relationship"<|>FILT - 3.6 - REF<|>A40545.2-9<|>The filter 3.6 - Ref is specified in the A40545.2-9 quote<|>8)
+##
+("relationship"<|>FILT - 2.55 - CH3I - MEAS<|>A40545.2-9<|>The filter 2.55 - CH3I - Meas is specified in the A40545.2-9 quote<|>8)
+##
+("relationship"<|>FILT - 3.6 - MEAS<|>A40545.2-9<|>The filter 3.6 - Meas is specified in the A40545.2-9 quote<|>8)
+##
+("relationship"<|>FILT - 2.55 - MEAS<|>A40545.2-9<|>The filter 2.55 - Meas is specified in the A40545.2-9 quote<|>8)
+##
+("relationship"<|>CELL - ELECTRIC - 50 ºC - 1 M - 316 SS - SAPPHIRE - ATM P<|>A40545.2-9<|>The cell is specified in the A40545.2-9 quote<|>5)
+##
+("relationship"<|>SRC - UV<|>A40545.2-9<|>UV is the source specified in the A40545.2-9 quote<|>8)
+##
+("relationship"<|>DET - UV W/SF<|>A40545.2-9<|>UV w/SF is the detector specified in the A40545.2-9 quote<|>8)
+##
+("relationship"<|>LENS - CAF2<|>A40545.2-9<|>CaF2 is the lens specified in the A40545.2-9 quote<|>5)
+##
+("relationship"<|>1 COMP NO INT<|>A40545.2-9<|>The application complexity is 1 COMP NO INT in the A40545.2-9 quote<|>10)
+##
+("relationship"<|>METHYL IODIDE IN CO<|>A40545.2-9<|>This application name is derived from Methyl iodide and Carbon monoxide in A40545.2-9 quote<|>10)
+##
+("relationship"<|>METHYL IODIDE - MEAS - 0.002 NOM - 0.03 QUOTE MAX<|>A40545.2-9<|>Methyl iodide is a measurement component in the A40545.2-9 quote<|>10)
+##
+("relationship"<|>CARBON MONOXIDE - MATRIX_OR_INT - 71.5 NOM<|>A40545.2-9<|>Carbon monoxide is a matrix or interferer in the A40545.2-9 quote<|>7)
+##
+("relationship"<|>NITROGEN - MATRIX_OR_INT - 9.5 NOM<|>A40545.2-9<|>Nitrogen is a matrix or interferer in the A40545.2-9 quote<|>7)
+##
+("relationship"<|>CARBON DIOXIDE - MATRIX_OR_INT - 4.3 NOM<|>A40545.2-9<|>Carbon dioxide is a matrix or interferer in the A40545.2-9 quote<|>7)
+##
+("relationship"<|>HYDROGEN - MATRIX_OR_INT - 12.5 NOM<|>A40545.2-9<|>Hydrogen is a matrix or interferer in the A40545.2-9 quote<|>7)
+##
+("relationship"<|>METHANE - MATRIX_OR_INT - 0.6 NOM<|>A40545.2-9<|>Methane is a matrix or interferer in the A40545.2-9 quote<|>7)
+##
+("relationship"<|>FILT - 2.55 - CH3I - MEAS<|>METHYL IODIDE - MEAS - 0.002 NOM - 0.03 QUOTE MAX<|>The filter 2.55 - CH3I - Meas is used to measure methyl iodide<|>10)
+##
+("relationship"<|>FILT - 2.55 - MEAS<|>METHYL IODIDE - MEAS - 0.002 NOM - 0.03 QUOTE MAX<|>The filter 2.55 - Meas may also be used to measure methyl iodide<|>8)
+##
+<|COMPLETE|>
+-------------------
+Example 2:
+text:
+Quote_ID: B68700.1-2
+Application_Complexity: 1 Comp / Multi Int
+Hardware_Config:
+  Sample_Cell:
+    Heating_Mode: Electric
+    Length: 128.0 mm
+    Material: 316 SS
+    Pressure: Return
+    Window: CaF2
+    Temperature: 80
+  Detector: BaF2
+  Source: IR
+  Lens: CaF2
+  Filters:
+  - Wavelength: 4.05
+    Role: Ref
+  - Wavelength: 4.68
+    Chem: CO
+    Role: Meas
+  - Wavelength: 6.3
+    Chem: Propylene
+    Role: Meas
+  - Wavelength: 6.4
+    Chem: Water
+    Role: Comp
+Streams:
+- Stream Number: 1
+  Chemicals:
+  - Name: Carbon dioxide
+    Type: Matrix or Interferer
+    Nominal_Concentration: 0.2
+  - Name: Carbon monoxide
+    Type: Measurement
+    Nominal_Concentration: 3.3
+    Quoted_Max_Measurement_Concentration: 15.0
+  - Name: 1-Butanal
+    Type: Matrix or Interferer
+    Nominal_Concentration: 1.0
+  - Name: Propylene
+    Type: Matrix or Interferer
+    Nominal_Concentration: 43.3
+  - Name: Water
+    Type: Matrix or Interferer
+    Nominal_Concentration: 0.3
+
+------------------
+output:
+("entity"<|>B68700.1-2<|>QUOTE_ID<|>The quote ID is B68700.1-2.)
+##
+("entity"<|>1 COMP MULTI INT<|>APPLICATION_COMPLEXITY<|>The application complexity is 1 component with multiple interferers.)
+##
+("entity"<|>CARBON MONOXIDE IN PROPYLENE<|>APPLICATION_NAME<|>This application measures Carbon monoxide (3.3 NOM, 15.0 QUOTE MAX) in a matrix of Carbon dioxide (0.2 NOM), 1-Butanal (1.0 NOM), Propylene (43.3 NOM), and Water (0.3 NOM). The application complexity is 1 Comp / Multi Int. The cell is electric heated at 80 ºC, length 128.0 mm, material 316 SS, window CaF2, pressure Return. The detector is BaF2 and the source is IR.)
+##
+("entity"<|>CELL - ELECTRIC - 80 ºC - 128.0 MM - 316 SS - CAF2 - RETURN P<|>CELL<|>A cell with electric heating mode, temperature of 80 degrees Celsius, length 128.0 mm, material 316 SS, window CaF2, and pressure Return.)
+##
+("entity"<|>DET - BAF2<|>DETECTOR<|>BaF2 is the detector used in the instrument.)
+##
+("entity"<|>SRC - IR<|>SOURCE<|>IR is the light source used in the instrument.)
+##
+("entity"<|>LENS - CAF2<|>LENS<|>CaF2 is the lens material used in the instrument.)
+##
+("entity"<|>FILT - 4.05 - REF<|>FILTER<|>4.05 - Ref is one of the filters used in the filter wheel.)
+##
+("entity"<|>FILT - 4.68 - CO - MEAS<|>FILTER<|>4.68 - CO Meas is one of the filters used in the filter wheel.)
+##
+("entity"<|>FILT - 6.3 - PROPYLENE - MEAS<|>FILTER<|>6.3 - Propylene Meas is one of the filters used in the filter wheel.)
+##
+("entity"<|>FILT - 6.4 - WATER - COMP<|>FILTER<|>6.4 - Water Comp is one of the filters used in the filter wheel.)
+##
+("entity"<|>CARBON DIOXIDE - MATRIX_OR_INT - 0.2 NOM<|>CHEMICAL<|>Carbon dioxide is a matrix or interferer with nominal concentration of 0.2.)
+##
+("entity"<|>CARBON MONOXIDE - MEAS - 3.3 NOM - 15.0 QUOTE MAX<|>CHEMICAL<|>Carbon monoxide is a measurement chemical with a nominal concentration of 3.3 and quoted max measurement concentration of 15.0.)
+##
+("entity"<|>1-BUTANAL - MATRIX_OR_INT - 1.0 NOM<|>CHEMICAL<|>1-Butanal is a matrix or interferer with nominal concentration of 1.0.)
+##
+("entity"<|>PROPYLENE - MATRIX_OR_INT - 43.3 NOM<|>CHEMICAL<|>Propylene is a matrix or interferer with nominal concentration of 43.3.)
+##
+("entity"<|>WATER - MATRIX_OR_INT - 0.3 NOM<|>CHEMICAL<|>Water is a matrix or interferer with nominal concentration of 0.3.)
+##
+("relationship"<|>FILT - 4.05 - REF<|>B68700.1-2<|>The filter 4.05 - Ref is specified in the B68700.1-2 quote<|>8)
+##
+("relationship"<|>FILT - 4.68 - CO - MEAS<|>B68700.1-2<|>The filter 4.68 - CO Meas is specified in the B68700.1-2 quote<|>8)
+##
+("relationship"<|>FILT - 6.3 - PROPYLENE - MEAS<|>B68700.1-2<|>The filter 6.3 - Propylene Meas is specified in the B68700.1-2 quote<|>8)
+##
+("relationship"<|>FILT - 6.4 - WATER - COMP<|>B68700.1-2<|>The filter 6.4 - Water Comp is specified in the B68700.1-2 quote<|>8)
+##
+("relationship"<|>CELL - ELECTRIC - 80 ºC - 128.0 MM - 316 SS - CAF2 - RETURN P<|>B68700.1-2<|>The cell is specified in the B68700.1-2 quote<|>5)
+##
+("relationship"<|>SRC - IR<|>B68700.1-2<|>IR is the source specified in the B68700.1-2 quote<|>8)
+##
+("relationship"<|>DET - BAF2<|>B68700.1-2<|>BaF2 is the detector specified in the B68700.1-2 quote<|>8)
+##
+("relationship"<|>LENS - CAF2<|>B68700.1-2<|>CaF2 is the lens specified in the B68700.1-2 quote<|>5)
+##
+("relationship"<|>1 COMP MULTI INT<|>B68700.1-2<|>The application complexity is 1 COMP MULTI INT in the B68700.1-2 quote<|>10)
+##
+("relationship"<|>CARBON MONOXIDE IN PROPYLENE<|>B68700.1-2<|>This application name is derived from Carbon monoxide and Propylene in B68700.1-2 quote<|>10)
+##
+("relationship"<|>CARBON MONOXIDE - MEAS - 3.3 NOM - 15.0 QUOTE MAX<|>B68700.1-2<|>Carbon monoxide is a measurement component in the B68700.1-2 quote<|>10)
+##
+("relationship"<|>CARBON DIOXIDE - MATRIX_OR_INT - 0.2 NOM<|>B68700.1-2<|>Carbon dioxide is a matrix or interferer in the B68700.1-2 quote<|>7)
+##
+("relationship"<|>1-BUTANAL - MATRIX_OR_INT - 1.0 NOM<|>B68700.1-2<|>1-Butanal is a matrix or interferer in the B68700.1-2 quote<|>7)
+##
+("relationship"<|>PROPYLENE - MATRIX_OR_INT - 43.3 NOM<|>B68700.1-2<|>Propylene is a matrix or interferer in the B68700.1-2 quote<|>7)
+##
+("relationship"<|>WATER - MATRIX_OR_INT - 0.3 NOM<|>B68700.1-2<|>Water is a matrix or interferer in the B68700.1-2 quote<|>7)
+##
+("relationship"<|>FILT - 4.68 - CO - MEAS<|>CARBON MONOXIDE - MEAS - 3.3 NOM - 15.0 QUOTE MAX<|>The filter 4.68 - CO Meas is used to measure carbon monoxide<|>10)
+##
+("relationship"<|>FILT - 6.3 - PROPYLENE - MEAS<|>PROPYLENE - MATRIX_OR_INT - 43.3 NOM<|>The filter 6.3 - Propylene Meas is used to measure propylene<|>8)
+##
+("relationship"<|>FILT - 6.4 - WATER - COMP<|>WATER - MATRIX_OR_INT - 0.3 NOM<|>The filter 6.4 - Water Comp is used to measure water for compensation<|>8)
+##
+<|COMPLETE|>
+######################
+-Real Data-
+######################
+text: {input_text}
+######################
+output:

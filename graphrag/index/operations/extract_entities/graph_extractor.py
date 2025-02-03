@@ -9,6 +9,7 @@ import traceback
 from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
+from string import Formatter
 
 import networkx as nx
 import tiktoken
@@ -29,7 +30,7 @@ DEFAULT_COMPLETION_DELIMITER = "<|COMPLETE|>"
 DEFAULT_ENTITY_TYPES = ["organization", "person", "geo", "event"]
 
 log = logging.getLogger(__name__)
-
+logging.basicConfig(level=logging.DEBUG)  # ensure DEBUG logs actually show up
 
 @dataclass
 class GraphExtractionResult:
@@ -152,13 +153,50 @@ class GraphExtractor:
     async def _process_document(
         self, text: str, prompt_variables: dict[str, str]
     ) -> str:
-        response = await self._llm(
-            self._extraction_prompt.format(**{
-                **prompt_variables,
-                self._input_text_key: text,
-            }),
-        )
+    # Log the inputs
+        #log.info("Processing document text:\n%s", text)
+        #log.info("Prompt variables: %s", prompt_variables)
+
+        lines = self._extraction_prompt.splitlines()
+        formatter = Formatter()
+
+        # Attempt to parse each line separately to isolate which line triggers the issue
+        for i, line in enumerate(lines):
+            try:
+                list(formatter.parse(line))  # Just parse it
+            except ValueError as e:
+                log.error(
+                    "Error parsing line %d: '%s' -> %s",
+                    i + 1,
+                    line.strip(),
+                    e
+                )
+                # you could raise here or continue checking the rest
+                raise
+
+        try:
+            # If we got here, each line can be parsed.
+            # The final issue might still be from .format expanding placeholders across lines,
+            # but at least we know each line is individually parseable.
+            formatted_prompt = self._extraction_prompt.format(
+                **{
+                    **prompt_variables,
+                    self._input_text_key: text,
+                }
+            )
+        except ValueError as e:
+            log.error(
+                "Error formatting the prompt. Possibly a placeholder crossing line boundaries:\n%s",
+                e
+            )
+            raise
+
+        #log.info("Final prompt sent to LLM:\n%s", formatted_prompt)
+
+        # Make the call to the LLM
+        response = await self._llm(formatted_prompt)
         results = response.output.content or ""
+        #log.info("LLM response:\n%s", results)
 
         # Repeat to ensure we maximize entity count
         for i in range(self._max_gleanings):
