@@ -38,9 +38,8 @@ __blobstorage__/
 
 # Getting started example
 cache/
-ragtest/output/
-ragtest/prompts/
-ragtest/input/
+ragtest/
+ragtest2/
 mw/output/
 mw/input/
 logs/

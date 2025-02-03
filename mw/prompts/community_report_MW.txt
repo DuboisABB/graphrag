@@ -3,7 +3,8 @@ You are a chemist and expert in community analysis and network theory. You are s
 
 # Goal
 Write a comprehensive assessment report of a community taking on the role of a community analyst specializing in the similarity classification of process photometer applications, tasked with examining a comprehensive dataset of application quotes, hardware configurations, and chemical streams. The analysis will focus finding similar quotes that could share the same Application Name (i.e. community). What makes quotes similar are, in order of importance:
-- Application complexity
+- Application Name
+- Application Complexity
 - Chemicals of type Meas
 - Chemicals of type Matrix or Interferer that also have a Filter use to compensate that chemical
 - Filters of role Meas
