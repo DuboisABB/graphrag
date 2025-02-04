@@ -19,6 +19,8 @@ models:
     api_version: "2024-08-01-preview"
     # organization: <organization_id>
     deployment_name: "gpt-4o-mini"
+    supports_system: true
+    supports_temperature : true
   chat_model_o1:
     api_key: ${GRAPHRAG_API_KEY} # set this in the generated .env file
     type: azure_openai_chat # or azure_openai_chat
@@ -30,9 +32,12 @@ models:
     async_mode: threaded # or asyncio
     # audience: "https://cognitiveservices.azure.com/.default"
     api_base: https://cog2-trnz2cbjn4ofs.openai.azure.com/
-    api_version: "2024-08-01-preview"
-    # organization: <organization_id>
+    #api_version: "2024-08-01-preview"
+    api_version: "2024-12-01-preview"
+        # organization: <organization_id>
     deployment_name: "o1"
+    supports_system: false
+    supports_temperature : false
   chat_model_o1_mini:
     api_key: ${GRAPHRAG_API_KEY} # set this in the generated .env file
     type: azure_openai_chat # or azure_openai_chat
@@ -47,6 +52,8 @@ models:
     api_version: "2024-08-01-preview"
     # organization: <organization_id>
     deployment_name: "o1-mini"
+    supports_system: false
+    supports_temperature : false
   chat_model_o3_mini:
     api_key: ${GRAPHRAG_API_KEY} # set this in the generated .env file
     type: azure_openai_chat # or azure_openai_chat
@@ -61,6 +68,8 @@ models:
     api_version: "2024-12-01-preview"
     # organization: <organization_id>
     deployment_name: "o3-mini"
+    supports_system: false
+    supports_temperature : false
   default_embedding_model:
     api_key: ${GRAPHRAG_API_KEY}
     type: azure_openai_embedding # or azure_openai_embedding
