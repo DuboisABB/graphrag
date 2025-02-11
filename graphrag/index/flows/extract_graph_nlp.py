@@ -7,6 +7,8 @@ from uuid import uuid4
 
 import pandas as pd
 
+from graphrag.cache.pipeline_cache import PipelineCache
+from graphrag.callbacks.workflow_callbacks import WorkflowCallbacks
 from graphrag.config.models.extract_graph_nlp_config import ExtractGraphNLPConfig
 from graphrag.config.models.prune_graph_config import PruneGraphConfig
 from graphrag.index.operations.build_noun_graph.build_noun_graph import build_noun_graph
@@ -17,11 +19,16 @@ from graphrag.index.operations.create_graph import create_graph
 from graphrag.index.operations.graph_to_dataframes import graph_to_dataframes
 from graphrag.index.operations.prune_graph import prune_graph
 
+from graphrag.operations.entity_normalization import normalize_entities
+
 
 def extract_graph_nlp(
     text_units: pd.DataFrame,
+    callbacks: WorkflowCallbacks,
+    cache: PipelineCache,
     extraction_config: ExtractGraphNLPConfig,
     pruning_config: PruneGraphConfig,
+    text_embed_config: dict,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """All the steps to create the base entity graph."""
     text_analyzer_config = extraction_config.text_analyzer
@@ -51,6 +58,18 @@ def extract_graph_nlp(
 
     # subset the full nodes and edges to only include the pruned remainders
     joined_nodes = pruned_nodes.merge(extracted_nodes, on="title", how="inner")
+
+    # Assume you have a GraphRagConfig instance named 'config', along with callbacks and cache.
+    normalized_nodes = await normalize_entities(joined_nodes, text_embed_config, callbacks, cache)
+
+    # Create mapping from original title to normalized title
+    mapping = dict(zip(normalized_nodes['title'], normalized_nodes['title_normalized']))
+
+    # Update nodes (if necessary, they already have title_normalized)
+    # Then, update the edges to use the normalized node names.
+    joined_edges["source"] = joined_edges["source"].map(mapping).fillna(joined_edges["source"])
+    joined_edges["target"] = joined_edges["target"].map(mapping).fillna(joined_edges["target"])    
+
     joined_edges = pruned_edges.merge(
         extracted_edges, on=["source", "target"], how="inner"
     )

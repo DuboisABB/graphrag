@@ -86,7 +86,7 @@ update_index_output:
 
 entity_extraction:
   model_id: default_chat_model
-  prompt: "prompts/entity_extraction_MW.txt"
+  prompt: "prompts/entity_extraction_MW_simple.txt"
   #prompt: "prompts/entity_extraction_original.txt"
   entity_types: [QUOTE_ID,APPLICATION_NAME,APPLICATION_COMPLEXITY,CELL,DETECTOR,SOURCE,LENS,FILTER,CHEMICAL]
   max_gleanings: 1

@@ -4,7 +4,7 @@ Given a YAML file that is relevant to this activity and a list of entity types, 
 -Steps-
 1. Identify all entities. For each identified entity, extract the following information:
 - entity_name: Name of the entity, capitalized
-- entity_type: One of the following types: [QUOTE_ID,APPLICATION_NAME,CELL,DETECTOR,SOURCE,LENS,FILTER,CHEMICAL]
+- entity_type: One of the following types: [QUOTE_ID,APPLICATION_NAME,CELL,FILTER,CHEMICAL,OPTICS]
 - entity_description: Comprehensive description of the entity's attributes and activities
 - Instructions for QUOTE_ID and APPLICATION_NAME: For the description of these entities, use the Quote_ID and Application_Summary.
 - Instructions for type CHEMICAL: For these chemical stream entities, the entity name should follow this pattern: <Name> - <Type> - <Measurement specification1> - <Measurement specification2>, etc
@@ -23,13 +23,14 @@ Given a YAML file that is relevant to this activity and a list of entity types, 
 - Instructions for CELL: form the name using this pattern:  CELL - <Heating_Mode> - <Temperature> ºC - <Lenght> - <Material> - <Window> - <Pressure> P
   Examples:
   CELL - ELECTRIC - 50 ºC - 2.0 MM - HAST C - SAPPHIRE - ATM P
-- Instructions for DETECTOR: always use the prefix DET, then a dash, then the name of the entity. For example: DET - UV - HIGH GAIN
-- Instructions for SOURCE: always use the prefix SRC, then a dash, then the name of the entity. For example: SRC - UV - LED
-- Instructions for LENS: always use the prefix LENS, then a dash, then the name of the entity. For example: LENS - SIO2
 - Instructions for FILTER: always use the prefix FILT, then a dash, then wavelength, a dash, the Chem, a dash and finally the role. If some property is missing, ignore it and removed its associated dash.
-  For example:
+  Examples:
   FILT - 3.71 - H2O - REF
   FILT - 3.71 - REF
+- Instructions for OPTICS: always use this pattern: SRC <Source> - DET <Detector> - LENS <Lens>
+  Examples:
+  SRC UV - DET UV W/SF - LENS CAF2
+  SRC IR - DET BAF2 - LENS CAF2
 1.1 MANDATORY: Format each entity as ("entity"<|><entity_name><|><entity_type><|><entity_description>)
 
 2. From the entities identified in step 1, identify all pairs of (source_entity, target_entity) that are related to each other (deduct the relationship from the YAML file structure).
@@ -38,10 +39,7 @@ For each pair of related entities, extract the following information:
 - target_entity: name of the target entity, as identified in step 1
 - relationship_description: explanation as to why you think the source entity and the target entity are related to each other
 - relationship_strength: an integer score between 1 to 10, indicating strength of the relationship between the source entity and target entity. Here are some explicit strenghts to use:
-  - DETECTOR <-> QUOTE_ID : 8
   - CELL <-> QUOTE_ID : 5
-  - LENS <-> QUOTE_ID : 5
-  - SOURCE <-> QUOTE_ID : 8
   - FILTER <-> QUOTE_ID : 8
   - CHEMICAL <-> QUOTE_ID : 10 if Meas or Matrix, 7 otherwise
   - APPLICATION_NAME <-> QUOTE_ID: 10
@@ -50,7 +48,6 @@ For each pair of related entities, extract the following information:
   - Create a relationship between CELL and the QUOTE_ID.
   - Create a relationship between a CHEMICAL and the QUOTE_ID. If type MEAS, make the strenght 10. If the CHEMICAL has a relationship with a FILTER, also make this relationship 10. Otherwise make it less strenght.
   - Attempt to create relationships between CHEMICAL and FILTER. For example, FILT - 2.55 - CH3I - MEAS would have a relationship with the CHEMICAL - METHYL IODIDE. The chemical names will not necessarily match but use your knowledge of chemistry to make the proper associations. Rate the strenght according to your confidence in the chemical match. Sometimes the role of the filter and the chemical type will not match but the chemical name will match. In these cases, still add a relationship but lower the strenght.
-- Don't create relationships between LENS, DETECTOR, SOURCE and CELL.
 2.1 MANDATORY: Format each relationship as ("relationship"<|><source_entity><|><target_entity><|><relationship_description><|><relationship_strength>)
 
 3. Return output in English as a single list of all the entities and relationships identified in steps 1 and 2. Use ## as the list delimiter. NO EXPLANATION. NO TRAILING SPACES. FOLLOW THE FORMAT EXPLAINED IN 1.1 and 2.1.
@@ -121,11 +118,7 @@ output:
 ##
 ("entity"<|>CELL - ELECTRIC - 50 ºC - 1 M - 316 SS - SAPPHIRE - ATM P<|>CELL<|>A cell with electric heating mode, temperature of 50 degrees Celsius, length 1 M, material 316 SS, window Sapphire, and pressure Atm.)
 ##
-("entity"<|>DET - UV W/SF<|>DETECTOR<|>UV w/SF is the detector used in the instrument.)
-##
-("entity"<|>SRC - UV<|>SOURCE<|>UV is the light source used in the instrument.)
-##
-("entity"<|>LENS - CAF2<|>LENS<|>CaF2 is the lens material used in the instrument.)
+("entity"<|>SRC UV - DET UV W/SF - LENS CAF2<|>OPTICS<|>UV light source, UV detector with SF, and CaF2 lens.)
 ##
 ("entity"<|>FILT - 3.6 - REF<|>FILTER<|>3.6 - Ref is one of the filters used in the filter wheel.)
 ##
@@ -157,11 +150,7 @@ output:
 ##
 ("relationship"<|>CELL - ELECTRIC - 50 ºC - 1 M - 316 SS - SAPPHIRE - ATM P<|>A40545.2-9<|>The cell is specified in the A40545.2-9 quote<|>5)
 ##
-("relationship"<|>SRC - UV<|>A40545.2-9<|>UV is the source specified in the A40545.2-9 quote<|>8)
-##
-("relationship"<|>DET - UV W/SF<|>A40545.2-9<|>UV w/SF is the detector specified in the A40545.2-9 quote<|>8)
-##
-("relationship"<|>LENS - CAF2<|>A40545.2-9<|>CaF2 is the lens specified in the A40545.2-9 quote<|>5)
+("relationship"<|>SRC UV - DET UV W/SF - LENS CAF2<|>A40545.2-9<|>The A40545.2-9 quote specifies a UV light source, UV detector with SF, and CaF2 lens<|>5)
 ##
 ("relationship"<|>METHYL IODIDE IN CO<|>A40545.2-9<|>This application name is Methyl iodide in CO for A40545.2-9 quote<|>10)
 ##
@@ -258,11 +247,7 @@ output:
 ##
 ("entity"<|>CELL - ELECTRIC - 80 ºC - 128.0 MM - 316 SS - CAF2 - RETURN P<|>CELL<|>A cell with electric heating mode, temperature of 80 degrees Celsius, length 128.0 mm, material 316 SS, window CaF2, and pressure Return.)
 ##
-("entity"<|>DET - BAF2<|>DETECTOR<|>BaF2 is the detector used in the instrument.)
-##
-("entity"<|>SRC - IR<|>SOURCE<|>IR is the light source used in the instrument.)
-##
-("entity"<|>LENS - CAF2<|>LENS<|>CaF2 is the lens material used in the instrument.)
+("entity"<|>SRC IR - DET BAF2 - LENS CAF2<|>OPTICS<|>IR light source, BAF2 detector, and CaF2 lens.)
 ##
 ("entity"<|>FILT - 4.05 - REF<|>FILTER<|>4.05 - Ref is one of the filters used in the filter wheel.)
 ##
@@ -292,11 +277,7 @@ output:
 ##
 ("relationship"<|>CELL - ELECTRIC - 80 ºC - 128.0 MM - 316 SS - CAF2 - RETURN P<|>B68700.1-2<|>The cell is specified in the B68700.1-2 quote<|>5)
 ##
-("relationship"<|>SRC - IR<|>B68700.1-2<|>IR is the source specified in the B68700.1-2 quote<|>8)
-##
-("relationship"<|>DET - BAF2<|>B68700.1-2<|>BaF2 is the detector specified in the B68700.1-2 quote<|>8)
-##
-("relationship"<|>LENS - CAF2<|>B68700.1-2<|>CaF2 is the lens specified in the B68700.1-2 quote<|>5)
+("relationship"<|>SRC IR - DET BAF2 - LENS CAF2<|>A40545.2-9<|>The A40545.2-9 quote specifies an IR light source, BAF2 detector, and CaF2 lens.<|>5)
 ##
 ("relationship"<|>CO IN PROPYLENE<|>B68700.1-2<|>This application name is CO in Propylene for the B68700.1-2 quote<|>10)
 ##

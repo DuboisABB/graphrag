@@ -17,7 +17,6 @@ from graphrag.utils.storage import load_table_from_storage, write_table_to_stora
 
 workflow_name = "extract_graph_nlp"
 
-
 async def run_workflow(
     config: GraphRagConfig,
     context: PipelineRunContext,
@@ -28,10 +27,15 @@ async def run_workflow(
         "create_base_text_units", context.storage
     )
 
+    text_embed = get_embedding_settings(config)
+
     base_entity_nodes, base_relationship_edges = extract_graph_nlp(
         text_units,
+        callbacks=_callbacks,
+        cache=context.cache,
         extraction_config=config.extract_graph_nlp,
         pruning_config=config.prune_graph,
+        text_embed_config=text_embed
     )
 
     await write_table_to_storage(

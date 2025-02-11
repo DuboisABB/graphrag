@@ -77,6 +77,8 @@ class CommunityReportsExtractor:
             prompt = self._extraction_prompt.replace(
                 "{" + self._input_text_key + "}", input_text
             )
+            # Log the prompt for debugging and improving examples
+            log.info("LLM prompt input: %s", prompt)
             response = await self._llm(
                 prompt,
                 json=True,
