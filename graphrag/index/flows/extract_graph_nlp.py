@@ -19,10 +19,10 @@ from graphrag.index.operations.create_graph import create_graph
 from graphrag.index.operations.graph_to_dataframes import graph_to_dataframes
 from graphrag.index.operations.prune_graph import prune_graph
 
-from graphrag.operations.entity_normalization import normalize_entities
+from graphrag.index.operations.entity_normalization import normalize_entities
 
 
-def extract_graph_nlp(
+async def extract_graph_nlp(
     text_units: pd.DataFrame,
     callbacks: WorkflowCallbacks,
     cache: PipelineCache,

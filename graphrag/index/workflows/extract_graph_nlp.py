@@ -5,6 +5,7 @@
 
 import pandas as pd
 
+from graphrag.config.embeddings import get_embedding_settings
 from graphrag.callbacks.workflow_callbacks import WorkflowCallbacks
 from graphrag.config.models.graph_rag_config import GraphRagConfig
 from graphrag.index.context import PipelineRunContext
@@ -29,7 +30,7 @@ async def run_workflow(
 
     text_embed = get_embedding_settings(config)
 
-    base_entity_nodes, base_relationship_edges = extract_graph_nlp(
+    base_entity_nodes, base_relationship_edges = await extract_graph_nlp(
         text_units,
         callbacks=_callbacks,
         cache=context.cache,

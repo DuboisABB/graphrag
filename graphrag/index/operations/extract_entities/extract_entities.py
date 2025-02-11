@@ -18,6 +18,7 @@ from graphrag.index.operations.extract_entities.typing import (
     ExtractEntityStrategyType,
 )
 from graphrag.index.run.derive_from_rows import derive_from_rows
+from graphrag.index.operations.entity_normalization import normalize_entities
 
 log = logging.getLogger(__name__)
 
@@ -35,6 +36,7 @@ async def extract_entities(
     async_mode: AsyncType = AsyncType.AsyncIO,
     entity_types=DEFAULT_ENTITY_TYPES,
     num_threads: int = 4,
+    text_embed_config: dict = None,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Extract entities from a piece of text.
@@ -135,6 +137,14 @@ async def extract_entities(
 
     entities = _merge_entities(entity_dfs)
     relationships = _merge_relationships(relationship_dfs)
+
+    # Integrate entity normalization to combine entities with similar names.
+    entities = await normalize_entities(entities, text_embed_config, callbacks, cache)
+
+    # Build mapping from the original title to the normalized title.
+    mapping = dict(zip(entities["title"], entities["title_normalized"]))
+    relationships["source"] = relationships["source"].apply(lambda x: mapping.get(x, x))
+    relationships["target"] = relationships["target"].apply(lambda x: mapping.get(x, x))    
 
     return (entities, relationships)
 

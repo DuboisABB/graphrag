@@ -6,7 +6,7 @@ from graphrag.config.embeddings import get_embedding_settings
 from graphrag.config.models.graph_rag_config import GraphRagConfig
 
 # We need to call embed_text from our embeddings module.
-from graphrag.index.operations.embed_text.embed_text import embed_text
+from graphrag.index.operations.embed_text import embed_text
 
 # Provide a default callback if none is given.
 try:
@@ -68,19 +68,16 @@ async def normalize_entities(
     })
 
     # Use embed_text function to compute embeddings.
-    # The embed_text function is asynchronous and expects: input DataFrame, callbacks, cache, embed_column, strategy,
-    # an embedding_name (we use "entity.title"), id_column and title_column.
     result_embeddings = await embed_text(
         input=tmp_df,
         callbacks=callbacks,
         cache=cache,
         embed_column="title",
         strategy=strategy,
-        embedding_name="entity.title",  # Adjust as needed based on your config.
+        embedding_name="entity.title",
         id_column="id",
         title_column="title"
     )
-    # result_embeddings is expected to be a list of embeddings.
     embeddings = np.array(result_embeddings)
 
     # Compute cosine similarity matrix between embeddings.
@@ -106,6 +103,31 @@ async def normalize_entities(
             label_to_canonical[label] = text
 
     normalized_titles = [label_to_canonical[label] for label in labels]
+    
+    # Create a debug dataframe to assist with troubleshooting
+    # First, group entities by their label
+    group_dict = {}
+    for label, name in zip(labels, texts):
+        group_dict.setdefault(label, []).append(name)
+
+    debug_records = []
+    for i, (orig_name, label, final_name) in enumerate(zip(texts, labels, normalized_titles)):
+        # List similar names in the group (excluding the current entity)
+        similar_names = [name for j, name in enumerate(texts) if labels[j] == label and j != i]
+        similar_str = ", ".join(similar_names) if similar_names else ""
+        # Compute the maximum similarity score for the current entity with others in the same group
+        similar_scores = [sim_matrix[i, j] for j in range(len(texts)) if labels[j] == label and j != i]
+        similarity = max(similar_scores) if similar_scores else 1.0
+        debug_records.append({
+            "Original Entity": orig_name,
+            "Similar Entity": similar_str,
+            "Similarity Score": similarity,
+            "Final Entity": final_name
+        })
+
+    debug_df = pd.DataFrame(debug_records)
+    debug_df.to_csv("debug_entity_normalization.csv", index=False)
+
     normalized_df = entities_df.copy()
     normalized_df["title_normalized"] = normalized_titles
     return normalized_df

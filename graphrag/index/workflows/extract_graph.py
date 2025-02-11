@@ -5,6 +5,7 @@
 
 import pandas as pd
 
+from graphrag.config.embeddings import get_embedding_settings
 from graphrag.callbacks.workflow_callbacks import WorkflowCallbacks
 from graphrag.config.models.graph_rag_config import GraphRagConfig
 from graphrag.index.context import PipelineRunContext
@@ -46,6 +47,8 @@ async def run_workflow(
     )
     summarization_num_threads = summarization_llm_settings.parallelization_num_threads
 
+    text_embed = get_embedding_settings(config)
+
     base_entity_nodes, base_relationship_edges = await extract_graph(
         text_units=text_units,
         callbacks=callbacks,
@@ -56,6 +59,7 @@ async def run_workflow(
         entity_types=entity_types,
         summarization_strategy=summarization_strategy,
         summarization_num_threads=summarization_num_threads,
+        text_embed_config=text_embed,
     )
 
     await write_table_to_storage(

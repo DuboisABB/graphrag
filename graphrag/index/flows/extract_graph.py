@@ -27,6 +27,7 @@ async def extract_graph(
     entity_types: list[str] | None = None,
     summarization_strategy: dict[str, Any] | None = None,
     summarization_num_threads: int = 4,
+    text_embed_config: dict = None,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """All the steps to create the base entity graph."""
     # this returns a graph for each text unit, to be merged later
@@ -40,6 +41,7 @@ async def extract_graph(
         async_mode=extraction_async_mode,
         entity_types=entity_types,
         num_threads=extraction_num_threads,
+        text_embed_config=text_embed_config,
     )
 
     if not _validate_data(entities):
