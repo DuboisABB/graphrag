@@ -90,6 +90,8 @@ entity_extraction:
   #prompt: "prompts/entity_extraction_original.txt"
   entity_types: [QUOTE_ID,APPLICATION_NAME,APPLICATION_COMPLEXITY,CELL,DETECTOR,SOURCE,LENS,FILTER,CHEMICAL]
   max_gleanings: 1
+  normalize_entities: false
+  normalize_threshold: 0.99
 
 summarize_descriptions:
   model_id: default_chat_model

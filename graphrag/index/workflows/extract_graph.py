@@ -45,9 +45,7 @@ async def run_workflow(
     summarization_strategy = config.summarize_descriptions.resolved_strategy(
         config.root_dir, summarization_llm_settings
     )
-    summarization_num_threads = summarization_llm_settings.parallelization_num_threads
-
-    text_embed = get_embedding_settings(config)
+    summarization_num_threads = summarization_llm_settings.parallelization_num_threads    
 
     base_entity_nodes, base_relationship_edges = await extract_graph(
         text_units=text_units,
@@ -59,7 +57,7 @@ async def run_workflow(
         entity_types=entity_types,
         summarization_strategy=summarization_strategy,
         summarization_num_threads=summarization_num_threads,
-        text_embed_config=text_embed,
+        config=config,
     )
 
     await write_table_to_storage(

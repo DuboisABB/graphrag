@@ -6,12 +6,12 @@ Given a YAML file that is relevant to this activity and a list of entity types, 
 - entity_name: Name of the entity, capitalized
 - entity_type: One of the following types: [QUOTE_ID,APPLICATION_NAME,CELL,DETECTOR,SOURCE,LENS,FILTER,CHEMICAL]
 - entity_description: Comprehensive description of the entity's attributes and activities
-- Instructions for QUOTE_ID and APPLICATION_NAME: For the description of these entities, use the Quote_ID and Application_Summary.
+- Instructions for QUOTE_ID and APPLICATION_NAME: For the description of these entities, use the Quote_ID, Application_Name and Application_Summary.
 - Instructions for type CHEMICAL: For these chemical stream entities, the entity name should follow this pattern: <Name> - <Type> - <Measurement specification1> - <Measurement specification2>, etc
   Here are how the different chemical characteristics should be translated to form part of the entity names:
     Type: Measurement -> MEAS
-	Type: Matrix -> MATRIX
-	Type: Matrix or Interferer -> MATRIX_OR_INT
+	  Type: Matrix -> MATRIX
+	  Type: Matrix or Interferer -> MATRIX_OR_INT
     Nominal_Concentration -> NOM
     Max_Concentration -> MAX
     Quoted_Max_Measurement_Concentration -> QUOTE MAX
@@ -48,8 +48,8 @@ For each pair of related entities, extract the following information:
 - Use the YAML hierarchy to create the relationships. The top level is the Quote_ID. If there are no entities for a certain level, skip it (like Hardware_Config, Stream and Filter_Wheel should be skipped). For example:
   - Create a relationship between each FILTER and the QUOTE_ID (skipping Filter_Wheel and Hardware_Config)
   - Create a relationship between CELL and the QUOTE_ID.
-  - Create a relationship between a CHEMICAL and the QUOTE_ID. If type MEAS, make the strenght 10. If the CHEMICAL has a relationship with a FILTER, also make this relationship 10. Otherwise make it less strenght.
-  - Attempt to create relationships between CHEMICAL and FILTER. For example, FILT - 2.55 - CH3I - MEAS would have a relationship with the CHEMICAL - METHYL IODIDE. The chemical names will not necessarily match but use your knowledge of chemistry to make the proper associations. Rate the strenght according to your confidence in the chemical match. Sometimes the role of the filter and the chemical type will not match but the chemical name will match. In these cases, still add a relationship but lower the strenght.
+  - Create a relationship between a CHEMICAL and the QUOTE_ID. If type MEAS, make the strength 10. If the CHEMICAL has a relationship with a FILTER, also make this relationship 10. Otherwise make it less strength.
+  - Attempt to create relationships between CHEMICAL and FILTER. For example, FILT - 2.55 - CH3I - MEAS would have a relationship with the CHEMICAL - METHYL IODIDE. The chemical names will not necessarily match but use your knowledge of chemistry to make the proper associations. Rate the strenght according to your confidence in the chemical match. Sometimes the role of the filter and the chemical type will not match but the chemical name will match. In these cases, still add a relationship but lower the strength.
 - Don't create relationships between LENS, DETECTOR, SOURCE and CELL.
 2.1 MANDATORY: Format each relationship as ("relationship"<|><source_entity><|><target_entity><|><relationship_description><|><relationship_strength>)
 
@@ -115,9 +115,9 @@ Streams:
     Nominal_Concentration: 0.6
 ------------------
 output:
-("entity"<|>A40545.2-9<|>QUOTE_ID<|>Quote ID A40545.2-9 application is Methyl iodide (0.002% nom, 0.03% max) measurement in a Carbon monoxide (71.5%) matrix with Hydrogen (12.5%), Nitrogen (9.5%), and Carbon dioxide (4.3%) present.)
+("entity"<|>A40545.2-9<|>QUOTE_ID<|>Quote ID A40545.2-9 application_name is Methyl iodide in CO, which is Methyl iodide (0.002% nom, 0.03% max) measurement in a Carbon monoxide (71.5%) matrix with Hydrogen (12.5%), Nitrogen (9.5%), and Carbon dioxide (4.3%) present.)
 ##
-("entity"<|>METHYL IODIDE IN CO<|>APPLICATION_NAME<|>Quote ID A40545.2-9 application is Methyl iodide (0.002% nom, 0.03% max) measurement in a Carbon monoxide (71.5%) matrix with Hydrogen (12.5%), Nitrogen (9.5%), and Carbon dioxide (4.3%) present.)
+("entity"<|>METHYL IODIDE IN CO<|>APPLICATION_NAME<|>Quote ID A40545.2-9 application_name is Methyl iodide in CO, which is Methyl iodide (0.002% nom, 0.03% max) measurement in a Carbon monoxide (71.5%) matrix with Hydrogen (12.5%), Nitrogen (9.5%), and Carbon dioxide (4.3%) present.)
 ##
 ("entity"<|>CELL - ELECTRIC - 50 ºC - 1 M - 316 SS - SAPPHIRE - ATM P<|>CELL<|>A cell with electric heating mode, temperature of 50 degrees Celsius, length 1 M, material 316 SS, window Sapphire, and pressure Atm.)
 ##
@@ -252,9 +252,9 @@ Streams:
     Nominal_Concentration: 0.3
 ------------------
 output:
-("entity"<|>B68700.1-2<|>QUOTE_ID<|>Quote ID B68700.1-2 application is CO (3.3% nom, 15.0% max) measurement in a Propylene (43.3% nom), Propane(15.4% nom) and Methane (11.2% nom) matrix with Water (0.3% nom) compensation.)
+("entity"<|>B68700.1-2<|>QUOTE_ID<|>Quote ID B68700.1-2 application_name is CO in Propylene, which is CO (3.3% nom, 15.0% max) measurement in a Propylene (43.3% nom), Propane(15.4% nom) and Methane (11.2% nom) matrix with Water (0.3% nom) compensation.)
 ##
-("entity"<|>CO IN PROPYLENE<|>APPLICATION_NAME<|>Quote ID B68700.1-2 application is CO (3.3% nom, 15.0% max) measurement in a Propylene (43.3% nom), Propane(15.4% nom) and Methane (11.2% nom) matrix with Water (0.3% nom) compensation.)
+("entity"<|>CO IN PROPYLENE<|>APPLICATION_NAME<|>Quote ID B68700.1-2 application_name is CO in Propylene, which is CO (3.3% nom, 15.0% max) measurement in a Propylene (43.3% nom), Propane(15.4% nom) and Methane (11.2% nom) matrix with Water (0.3% nom) compensation.)
 ##
 ("entity"<|>CELL - ELECTRIC - 80 ºC - 128.0 MM - 316 SS - CAF2 - RETURN P<|>CELL<|>A cell with electric heating mode, temperature of 80 degrees Celsius, length 128.0 mm, material 316 SS, window CaF2, and pressure Return.)
 ##
