@@ -88,10 +88,11 @@ entity_extraction:
   model_id: default_chat_model
   prompt: "prompts/entity_extraction_MW_simple.txt"
   #prompt: "prompts/entity_extraction_original.txt"
-  entity_types: [QUOTE_ID,APPLICATION_NAME,APPLICATION_COMPLEXITY,CELL,DETECTOR,SOURCE,LENS,FILTER,CHEMICAL]
+  entity_types: [QUOTE_ID,APPLICATION_NAME,APPLICATION_COMPLEXITY,CELL,FILTER,CHEMICAL,OPTICS]
   max_gleanings: 1
-  normalize_entities: false
-  normalize_threshold: 0.99
+  normalize_entities: true
+  normalize_threshold: 0.98
+  normalize_model: default_embedding_model # default_embedding_model or "gbyuvd/ChemEmbed-v01"
 
 summarize_descriptions:
   model_id: default_chat_model

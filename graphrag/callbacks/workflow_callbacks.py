@@ -44,3 +44,5 @@ class WorkflowCallbacks(Protocol):
     def log(self, message: str, details: dict | None = None) -> None:
         """Handle when a log message occurs."""
         ...
+# Re-export the concrete no-op implementation.
+from .noop_workflow_callbacks import NoopWorkflowCallbacks

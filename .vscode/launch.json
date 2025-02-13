@@ -12,7 +12,21 @@
 				"poe", "index",
 				"--root", "./mw"
 			],
+			"cwd": "${workspaceFolder}",
+			"envFile": "${workspaceFolder}/mw/.env"					
 		},
+		{
+			"name": "Debug Normalization",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "poetry",
+			"args": [
+				"run", "python",
+				"--m", "graphrag.index.operations.debug_entity_normalization"
+			],
+			"cwd": "${workspaceFolder}",
+			"envFile": "${workspaceFolder}/mw/.env"					
+		},		
 		{
 			"name": "Query",
 			"type": "debugpy",
@@ -24,6 +38,8 @@
 				"--method", "global",
 				"--query", "What are the top themes in this story",
 			]
+			"cwd": "${workspaceFolder}",
+			"envFile": "${workspaceFolder}/mw/.env"			
 		},
 		{
 			"name": "Prompt Tuning",

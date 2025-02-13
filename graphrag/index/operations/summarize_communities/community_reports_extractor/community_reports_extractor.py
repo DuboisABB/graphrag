@@ -78,7 +78,6 @@ class CommunityReportsExtractor:
                 "{" + self._input_text_key + "}", input_text
             )
             # Log the prompt for debugging and improving examples
-            log.info("LLM prompt input: %s", prompt)
             response = await self._llm(
                 prompt,
                 json=True,
@@ -87,6 +86,7 @@ class CommunityReportsExtractor:
                 model_parameters={"max_tokens": self._max_report_length},
             )
             output = response.parsed_json
+            log.info("Input text: %s, LLM response: %s", input_text, output)            
         except Exception as e:
             log.exception("error generating community report")
             self._on_error(e, traceback.format_exc(), None)

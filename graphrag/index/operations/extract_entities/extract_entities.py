@@ -140,14 +140,12 @@ async def extract_entities(
     entities = _merge_entities(entity_dfs)
     relationships = _merge_relationships(relationship_dfs)
 
-    text_embed_config = get_embedding_settings(config)
-
-    normalize_entities = config.entity_extraction.normalize_entities
+    normalize_entities_flag = config.entity_extraction.normalize_entities
     normalize_threshold = config.entity_extraction.normalize_threshold
 
-    if normalize_entities:
+    if normalize_entities_flag:
         # Integrate entity normalization to combine entities with similar names.
-        entities = await normalize_entities(entities, text_embed_config, callbacks, cache, normalize_threshold)
+        entities = await normalize_entities(entities, config, callbacks, cache, normalize_threshold)
 
         # Build mapping from the original title to the normalized title.
         mapping = dict(zip(entities["title"], entities["title_normalized"]))

@@ -35,6 +35,18 @@ class EntityExtractionConfig(BaseModel):
         description="The model ID to use for text embeddings.",
         default=defs.ENTITY_EXTRACTION_MODEL_ID,
     )
+    normalize_entities: bool = Field(
+        description="If true, perform normalization (merging similar names) on extracted entities.",
+        default=False,
+    )
+    normalize_threshold: float = Field(
+        description="Threshold for entity normalization (if applicable).",
+        default=0.7,
+    )    
+    normalize_model: str = Field(
+        description="Embedding model for entity normalization (if applicable).",
+        default="default_embedding_model",
+    )    
 
     def resolved_strategy(
         self, root_dir: str, model_config: LanguageModelConfig

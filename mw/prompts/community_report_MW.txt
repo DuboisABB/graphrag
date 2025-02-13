@@ -9,11 +9,11 @@ The content of this report includes an overview of the community's key entities 
 
 # Report Structure
 The report should include the following sections:
-- TITLE: community's name that represents its Application Name. Typycally of the form <measurement chemical(s)> in <main matrix chemical>.
-- SUMMARY: An executive summary of the community. This will typically be the description of the Quote_ID or description of the Application_Name.
+- TITLE: community's name that represents its Application Name. Typically of the form <measurement chemical(s)> in <main matrix chemical>.
+- SUMMARY: An executive summary of the community. This will typically be the description of the Quote_ID and description of the Application_Name.
 - REPORT RATING: A float score between 0-10 that represents the relevance of the data to the classification and analysis of process photometer applications, including hardware configurations, chemical streams, and application complexities, with 1 being trivial or irrelevant and 10 being highly significant, impactful, and essential for understanding similarities and interactions within the domain.
 - RATING EXPLANATION: Give a single sentence explanation of the rating.
-- DETAILED FINDINGS: A list of 5-10 key insights about the community. Each insight should have a short summary followed by multiple paragraphs of explanatory text grounded according to the grounding rules below. Be comprehensive.
+- DETAILED FINDINGS: A list of 5-10 key insights about the community. Each insight should have a short summary followed by multiple paragraphs of explanatory text grounded according to the grounding rules below. Focus mostly on quote id, application name and the chemicals in the stream.
 
 Return output as a well-formed JSON-formatted string with the following format. Don't use any unnecessary escape sequences. The output should be a single JSON object that can be parsed by json.loads.
     {
@@ -34,52 +34,65 @@ This is a paragraph of the output text [records: Entities (1, 2, 3), Claims (2, 
 # Example Input
 -----------
 Text:
+-----Entities-----
+human_readable_id,title,description,degree
+75,A57398.2-1,"Quote ID A57398.2-1 application_name is NH3 and N2O in Water, which is N2O (0.27% nom, 20.0% max) and NH3 (81.5% nom, 90.0% max) measurements in a Water matrix (11.8%) with temperature compensation.",13
+82,AMMONIA - MEAS - 81.5 NOM - 90.0 QUOTE MAX,Ammonia is a measurement chemical with a nominal concentration of 81.5 and quoted max measurement concentration of 90.0.,2
+83,NITROUS OXIDE - MEAS - 0.27 NOM - 20.0 QUOTE MAX,Nitrous oxide is a measurement chemical with a nominal concentration of 0.27 and quoted max measurement concentration of 20.0.,2
+85,WATER - MATRIX_OR_INT - 11.8 NOM,Water is a matrix or interferer with nominal concentration of 11.8.,2
+78,FILT - 3.76 - REF,3.76 - Ref is one of the filters used in the filter wheel.,1
+77,CELL - ELECTRIC - 90 ºC - 32.0 MM - 316 SS - CAF2 - ATM P,"A cell with electric heating mode, temperature of 90 degrees Celsius, length 32.0 mm, material 316 SS, window CaF2, and pressure Atm.",1
+76,NH3 AND N2O IN WATER,"Quote ID A57398.2-1 application_name is NH3 and N2O in Water, which is N2O (0.27% nom, 20.0% max) and NH3 (81.5% nom, 90.0% max) measurements in a Water matrix (11.8%) with temperature compensation.",1
+84,OXYGEN - MATRIX_OR_INT - 0.03 NOM,Oxygen is a matrix or interferer with nominal concentration of 0.03.,1
+86,2-METHYL-2-PROPANOL - MATRIX_OR_INT - 6.4 NOM,2-Methyl-2-propanol is a matrix or interferer with nominal concentration of 6.4.,1
+87,WATER - MATRIX - 11.8 NOM,,1
+79,FILT - 4.5 - N2O - MEAS,4.5 - N2O Meas is one of the filters used in the filter wheel.,2
+80,FILT - 3.0 - NH3 - MEAS,3.0 - NH3 Meas is one of the filters used in the filter wheel.,2
+81,FILT - 5.3 - H2O - COMP,5.3 - H2O Comp is one of the filters used in the filter wheel.,2
 
-Entities
 
-id,entity,description
-5,ABILA CITY PARK,Abila City Park is the location of the POK rally
-
-Relationships
-
-id,source,target,description
-37,ABILA CITY PARK,POK RALLY,Abila City Park is the location of the POK rally
-38,ABILA CITY PARK,POK,POK is holding a rally in Abila City Park
-39,ABILA CITY PARK,POKRALLY,The POKRally is taking place at Abila City Park
-40,ABILA CITY PARK,CENTRAL BULLETIN,Central Bulletin is reporting on the POK rally taking place in Abila City Park
+-----Relationships-----
+human_readable_id,source,target,description,combined_degree
+103,A57398.2-1,AMMONIA - MEAS - 81.5 NOM - 90.0 QUOTE MAX,Ammonia is a measurement component in the A57398.2-1 quote,15
+104,A57398.2-1,NITROUS OXIDE - MEAS - 0.27 NOM - 20.0 QUOTE MAX,Nitrous oxide is a measurement component in the A57398.2-1 quote,15
+106,A57398.2-1,WATER - MATRIX_OR_INT - 11.8 NOM,Water is a matrix or interferer in the A57398.2-1 quote,15
+96,A57398.2-1,FILT - 3.76 - REF,The filter 3.76 - Ref is specified in the A57398.2-1 quote,14
+100,A57398.2-1,CELL - ELECTRIC - 90 ºC - 32.0 MM - 316 SS - CAF2 - ATM P,The cell is specified in the A57398.2-1 quote,14
+102,A57398.2-1,NH3 AND N2O IN WATER,This application name is NH3 and N2O in Water for A57398.2-1 quote,14
+105,A57398.2-1,OXYGEN - MATRIX_OR_INT - 0.03 NOM,Oxygen is a matrix or interferer in the A57398.2-1 quote,14
+107,A57398.2-1,2-METHYL-2-PROPANOL - MATRIX_OR_INT - 6.4 NOM,2-Methyl-2-propanol is a matrix or interferer in the A57398.2-1 quote,14
+108,A57398.2-1,WATER - MATRIX - 11.8 NOM,Water is a matrix in the A57398.2-1 quote,14
+109,FILT - 4.5 - N2O - MEAS,NITROUS OXIDE - MEAS - 0.27 NOM - 20.0 QUOTE MAX,The filter 4.5 - N2O Meas is used to measure nitrous oxide,4
+110,FILT - 3.0 - NH3 - MEAS,AMMONIA - MEAS - 81.5 NOM - 90.0 QUOTE MAX,The filter 3.0 - NH3 Meas is used to measure ammonia,4
+111,FILT - 5.3 - H2O - COMP,WATER - MATRIX_OR_INT - 11.8 NOM,The filter 5.3 - H2O Comp is used to measure water for compensation,4
 
 Output:
 {
-    "title": "Abila City Park and POK Rally",
-    "summary": "The community revolves around the Abila City Park, which is the location of the POK rally. The park has relationships with POK, POKRALLY, and Central Bulletin, all
-of which are associated with the rally event.",
-    "rating": 5.0,
-    "rating_explanation": "The impact rating is moderate due to the potential for unrest or conflict during the POK rally.",
+    "title": "NH3 and N2O in Water",
+    "summary": "The application name is 'NH3 and N2O in Water', for Quote ID A57398.2-1.",
+    "rating": 10,
+    "rating_explanation": "The chemical stream composition corresponds well to the application name 'NH3 and N2O in Water'.",
     "findings": [
         {
-            "summary": "Abila City Park as the central location",
-            "explanation": "Abila City Park is the central entity in this community, serving as the location for the POK rally. This park is the common link between all other
-entities, suggesting its significance in the community. The park's association with the rally could potentially lead to issues such as public disorder or conflict, depending on the
-nature of the rally and the reactions it provokes. [records: Entities (5), Relationships (37, 38, 39, 40)]"
+            "summary": "Quote ID: A57398.2-1",
+            "explanation": "The Quote ID is A57398.2-1. [records: Entities (75)]"
+        },        
+        {
+            "summary": "Measurement: N2O and NH3",
+            "explanation": "N2O (0.27% nom, 20.0% max) and NH3 (81.5% nom, 90.0% max) are the main chemical measurements in the stream. [records: Entities (75, 82, 83), Relationships (103, 104)]"
         },
         {
-            "summary": "POK's role in the community",
-            "explanation": "POK is another key entity in this community, being the organizer of the rally at Abila City Park. The nature of POK and its rally could be a potential
-source of threat, depending on their objectives and the reactions they provoke. The relationship between POK and the park is crucial in understanding the dynamics of this community.
-[records: Relationships (38)]"
+            "summary": "Matrix: Water",
+            "explanation": "Water (11.8%) is the main chemical in the in the stream matrix. [records: Entities (75, 85), Relationships (106)]"
         },
         {
-            "summary": "POKRALLY as a significant event",
-            "explanation": "The POKRALLY is a significant event taking place at Abila City Park. This event is a key factor in the community's dynamics and could be a potential
-source of threat, depending on the nature of the rally and the reactions it provokes. The relationship between the rally and the park is crucial in understanding the dynamics of this
-community. [records: Relationships (39)]"
-        },
+            "summary": "Temperature compensation",
+            "explanation": "The application requires temperature compensation. [records: Entities (75)]"
+        },        
         {
-            "summary": "Role of Central Bulletin",
-            "explanation": "Central Bulletin is reporting on the POK rally taking place in Abila City Park. This suggests that the event has attracted media attention, which could
-amplify its impact on the community. The role of Central Bulletin could be significant in shaping public perception of the event and the entities involved. [records: Relationships
-(40)]"
-        }
+            "summary": "Cell: ELECTRIC - 90 ºC - 32.0 MM - 316 SS - CAF2 - ATM P",
+            "explanation": "The sampling cell has electric heating mode, temperature of 90 degrees Celsius, length 32.0 mm, material 316 SS, window CaF2, and pressure Atm. [records: Entities (77), Relationships (100)]"
+        }            
     ]
 
 }
