@@ -9,28 +9,38 @@ Given a YAML file that is relevant to this activity and a list of entity types, 
 - Instructions for QUOTE_ID and APPLICATION_NAME: For the description of these entities, use the Quote_ID, Application_Name and Application_Summary.
 - Instructions for type CHEMICAL: For these chemical stream entities, the entity name should follow this pattern: <Name> - <Type> - <Measurement specification1> - <Measurement specification2>, etc
   Here are how the different chemical characteristics should be translated to form part of the entity names:
-    Type: Measurement -> MEAS
-	  Type: Matrix -> MATRIX
-	  Type: Matrix or Interferer -> MATRIX_OR_INT
-    Nominal_Concentration -> NOM
-    Max_Concentration -> MAX
-    Quoted_Max_Measurement_Concentration -> QUOTE MAX
-    Desired_Measurement_Repeatability -> REPEAT
-  Examples:
-    WATER - MEAS - 0.0006 NOM - 0.01 MAX - 0.01 QUOTE MAX - 1.0 REPEAT
-    DIMETHYL SULFOXIDE - MATRIX_OR_INT - 10 NOM - 100 MAX
-	1,2-DICHLOROETHANE - MATRIX - 99.9 NOM - 100.0 MAX
+    • Type: Measurement -> MEAS
+	  • Type: Matrix -> MATRIX
+	  • Type: Matrix or Interferer -> MATRIX_OR_INT
+    • Nominal_Concentration -> NOM
+    • Max_Concentration -> MAX
+    • Quoted_Max_Measurement_Concentration -> QUOTE MAX
+    • Desired_Measurement_Repeatability -> REPEAT
+  For the chemical names, don't necessarily use the exact name in the quote. Rather, use commonly used names.
+  Name examples:
+    • CO instead of carbon monoxide
+    • CO2 instead of carbon dioxide
+    • Water instead of H2O
+    • H2S instead of hydrogen sulfide
+    • VCM instead of vinyl chloride
+    • n-Butane (or just Butane) instead of C4H10
+    • EDC instead of 1,2-Dichloroethane
+    • Benzene instead of C6H6    
+  Final CHEMICAL type entity name examples:
+    • WATER - MEAS - 0.0006 NOM - 0.01 MAX - 0.01 QUOTE MAX - 1.0 REPEAT
+    • DIMETHYL SULFOXIDE - MATRIX_OR_INT - 10 NOM - 100 MAX
+	  • 1,2-DICHLOROETHANE - MATRIX - 99.9 NOM - 100.0 MAX
 - Instructions for CELL: form the name using this pattern:  CELL - <Heating_Mode> - <Temperature> ºC - <Lenght> - <Material> - <Window> - <Pressure> P
   Examples:
-  CELL - ELECTRIC - 50 ºC - 2.0 MM - HAST C - SAPPHIRE - ATM P
+  • CELL - ELECTRIC - 50 ºC - 2.0 MM - HAST C - SAPPHIRE - ATM P
 - Instructions for FILTER: always use the prefix FILT, then a dash, then wavelength, a dash, the Chem, a dash and finally the role. If some property is missing, ignore it and removed its associated dash.
   Examples:
-  FILT - 3.71 - H2O - REF
-  FILT - 3.71 - REF
+  • FILT - 3.71 - H2O - REF
+  • FILT - 3.71 - REF
 - Instructions for OPTICS: always use this pattern: SRC <Source> - DET <Detector> - LENS <Lens>
   Examples:
-  SRC UV - DET UV W/SF - LENS CAF2
-  SRC IR - DET BAF2 - LENS CAF2
+  • SRC UV - DET UV W/SF - LENS CAF2
+  • SRC IR - DET BAF2 - LENS CAF2
 1.1 MANDATORY: Format each entity as ("entity"<|><entity_name><|><entity_type><|><entity_description>)
 
 2. From the entities identified in step 1, identify all pairs of (source_entity, target_entity) that are related to each other (deduct the relationship from the YAML file structure).
@@ -39,10 +49,10 @@ For each pair of related entities, extract the following information:
 - target_entity: name of the target entity, as identified in step 1
 - relationship_description: explanation as to why you think the source entity and the target entity are related to each other
 - relationship_strength: an integer score between 1 to 10, indicating strength of the relationship between the source entity and target entity. Here are some explicit strenghts to use:
-  - CELL <-> QUOTE_ID : 5
-  - FILTER <-> QUOTE_ID : 8
-  - CHEMICAL <-> QUOTE_ID : 10 if Meas or Matrix, 7 otherwise
-  - APPLICATION_NAME <-> QUOTE_ID: 10
+  • CELL <-> QUOTE_ID : 5
+  • FILTER <-> QUOTE_ID : 8
+  • CHEMICAL <-> QUOTE_ID : 10 if Meas or Matrix, 7 otherwise
+  • APPLICATION_NAME <-> QUOTE_ID: 10
 - Use the YAML hierarchy to create the relationships. The top level is the Quote_ID. If there are no entities for a certain level, skip it (like Hardware_Config, Stream and Filter_Wheel should be skipped). For example:
   - Create a relationship between each FILTER and the QUOTE_ID (skipping Filter_Wheel and Hardware_Config)
   - Create a relationship between CELL and the QUOTE_ID.
@@ -53,7 +63,6 @@ For each pair of related entities, extract the following information:
 3. Return output in English as a single list of all the entities and relationships identified in steps 1 and 2. Use ## as the list delimiter. NO EXPLANATION. NO TRAILING SPACES. FOLLOW THE FORMAT EXPLAINED IN 1.1 and 2.1.
 
 4. When finished, output <|COMPLETE|>.
-
 
 ######################
 -Examples-

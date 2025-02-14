@@ -19,7 +19,7 @@ Given a YAML file that is relevant to this activity and a list of entity types, 
   Examples:
     WATER - MEAS - 0.0006 NOM - 0.01 MAX - 0.01 QUOTE MAX - 1.0 REPEAT
     DIMETHYL SULFOXIDE - MATRIX_OR_INT - 10 NOM - 100 MAX
-	1,2-DICHLOROETHANE - MATRIX - 99.9 NOM - 100.0 MAX
+	  1,2-DICHLOROETHANE - MATRIX - 99.9 NOM - 100.0 MAX
 - Instructions for CELL: form the name using this pattern:  CELL - <Heating_Mode> - <Temperature> ºC - <Lenght> - <Material> - <Window> - <Pressure> P
   Examples:
   CELL - ELECTRIC - 50 ºC - 2.0 MM - HAST C - SAPPHIRE - ATM P
