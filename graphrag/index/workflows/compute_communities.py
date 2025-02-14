@@ -7,6 +7,7 @@ import pandas as pd
 
 from graphrag.callbacks.workflow_callbacks import WorkflowCallbacks
 from graphrag.config.models.graph_rag_config import GraphRagConfig
+from graphrag.config.models.cluster_graph_config import ClusterGraphConfig
 from graphrag.index.context import PipelineRunContext
 from graphrag.index.flows.compute_communities import compute_communities
 from graphrag.utils.storage import load_table_from_storage, write_table_to_storage
@@ -28,11 +29,12 @@ async def run_workflow(
     use_lcc = config.cluster_graph.use_lcc
     seed = config.cluster_graph.seed
 
+    # Extract the cluster_graph config from the overall configuration
+    cluster_config = config.cluster_graph
+
     base_communities = compute_communities(
         base_relationship_edges,
-        max_cluster_size=max_cluster_size,
-        use_lcc=use_lcc,
-        seed=seed,
+        config=cluster_config,
     )
 
     await write_table_to_storage(base_communities, "base_communities", context.storage)

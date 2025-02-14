@@ -130,6 +130,13 @@ class AsyncType(str, Enum):
     AsyncIO = "asyncio"
     Threaded = "threaded"
 
+class ClusterGraphStrategyType(str, Enum):
+    """The cluster graph strategy type."""
+
+    leiden = "leiden"
+    """Standard clustering using the leiden algorithm."""
+    app_name = "app_name"
+    """Clustering based on APPLICATION_NAME attribute."""
 
 class ChunkStrategyType(str, Enum):
     """ChunkStrategy class definition."""

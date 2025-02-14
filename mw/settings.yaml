@@ -117,6 +117,7 @@ community_reports:
   max_input_length: 8000
 
 cluster_graph:
+  strategy: app_name  # options: 'standard' or 'app_name'
   max_cluster_size: 10
 
 embed_graph:

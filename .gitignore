@@ -42,6 +42,7 @@ ragtest/
 ragtest2/
 mw/output/
 mw/input/
+mw/input_long/
 logs/
 .ragtest/
 .pipelines
