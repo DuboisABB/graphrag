@@ -9,7 +9,7 @@ The content of this report includes an overview of the community's key entities 
 
 # Report Structure
 The report should include the following sections:
-- TITLE: community's name that represents its Application Name. Typically of the form <measurement chemical(s)> in <main matrix chemical>.
+- TITLE: community's name that represents its Application Name. Typically of the form <measurement chemical(s)> in <main matrix chemical>. If you can't find an Application Name in the input, the title should be Undefined.
 - SUMMARY: An executive summary of the community. This will typically be the description of the Quote_ID and description of the Application_Name.
 - REPORT RATING: A float score between 0-10 that represents the relevance of the data to the classification and analysis of process photometer applications, including hardware configurations, chemical streams, and application complexities, with 1 being trivial or irrelevant and 10 being highly significant, impactful, and essential for understanding similarities and interactions within the domain.
 - RATING EXPLANATION: Give a single sentence explanation of the rating.

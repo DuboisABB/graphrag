@@ -7,7 +7,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 from graphrag.config.embeddings import get_embedding_settings
 from graphrag.config.models.graph_rag_config import GraphRagConfig
 from sentence_transformers import SentenceTransformer
-from graphrag.callbacks.workflow_callbacks import NoopWorkflowCallbacks
+#from graphrag.callbacks.workflow_callbacks import NoopWorkflowCallbacks
+from graphrag.callbacks.noop_workflow_callbacks import NoopWorkflowCallbacks
 
 # We need to call embed_text from our embeddings module.
 from graphrag.index.operations.embed_text import embed_text
@@ -20,7 +21,8 @@ async def normalize_entities(
     config: GraphRagConfig = None,
     callbacks=None,  # Instance of WorkflowCallbacks (optional)
     cache=None,      # Instance of PipelineCache (optional)
-    threshold: float = 0.85
+    threshold: float = 0.98,
+    save_parquet_cache: bool = True,
 ) -> pd.DataFrame:
     """
     Normalize entity names by computing embeddings on a subset of the entities (those with type CHEMICAL or APPLICATION_NAME).
@@ -51,15 +53,16 @@ async def normalize_entities(
     if 'type' not in entities_df.columns:
         raise ValueError("The DataFrame must contain a 'type' column.")
 
-    # Save the extracted entities cache so that debug_entity_normalization can load it.    
-    extracted_cache_dir = "./mw/cache/entity_extraction/"
-    os.makedirs(extracted_cache_dir, exist_ok=True)
-    extracted_cache_path = os.path.join(extracted_cache_dir, "extracted_entities.parquet")
-    try:
-        entities_df.to_parquet(extracted_cache_path, index=False)
-        log.info("Saved extracted entities cache to %s", extracted_cache_path)
-    except Exception as e:
-        log.exception("Error saving extracted entities cache: %s", e)        
+    if save_parquet_cache:
+        # Save the extracted entities cache so that debug_entity_normalization can load it.    
+        extracted_cache_dir = "./mw/cache/entity_extraction/"
+        os.makedirs(extracted_cache_dir, exist_ok=True)
+        extracted_cache_path = os.path.join(extracted_cache_dir, "extracted_entities.parquet")
+        try:
+            entities_df.to_parquet(extracted_cache_path, index=False)
+            log.info("Saved extracted entities cache to %s", extracted_cache_path)
+        except Exception as e:
+            log.exception("Error saving extracted entities cache: %s", e)        
 
     if callbacks is None:
         callbacks = NoopWorkflowCallbacks()
@@ -189,14 +192,15 @@ async def normalize_entities(
     for idx, new_title in normalized_map.items():
         normalized_df.at[idx, "title_normalized"] = new_title
 
-    # Save the normalized entities to a parquet cache file.
-    cache_dir = "./mw/cache/entity_normalization/"
-    os.makedirs(cache_dir, exist_ok=True)
-    cache_path = os.path.join(cache_dir, "normalized_entities.parquet")
-    try:
-        normalized_df.to_parquet(cache_path, index=False)
-        log.info("Saved normalized entities cache to %s", cache_path)
-    except Exception as e:
-        log.exception("Error saving normalized entities cache: %s", e)
+    if save_parquet_cache:
+        # Save the normalized entities to a parquet cache file.
+        cache_dir = "./mw/cache/entity_normalization/"
+        os.makedirs(cache_dir, exist_ok=True)
+        cache_path = os.path.join(cache_dir, "normalized_entities.parquet")
+        try:
+            normalized_df.to_parquet(cache_path, index=False)
+            log.info("Saved normalized entities cache to %s", cache_path)
+        except Exception as e:
+            log.exception("Error saving normalized entities cache: %s", e)
 
     return normalized_df
