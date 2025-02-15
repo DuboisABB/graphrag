@@ -4,7 +4,7 @@
 """A module containing cluster_graph, apply_clustering and run_layout methods definition."""
 
 import logging
-
+import pprint
 import networkx as nx
 
 from graphrag.config.enums import ClusterGraphStrategyType
@@ -16,60 +16,70 @@ Communities = list[tuple[int, int, int, list[str]]]
 
 log = logging.getLogger(__name__)
 
-
 def cluster_graph_according_to_config(
     graph: nx.Graph, config: ClusterGraphConfig
 ) -> Communities:
-    """Cluster the graph based on the provided configuration."""
+    """Cluster the graph based on the provided configuration.
+    
+    This method runs both community clustering strategies and writes their results
+    to separate debug files. However, only the community result that matches the config's
+    strategy is returned.
+    """
+    # Run both strategies
+    communities_app = cluster_graph_app_name(graph)
+    communities_general = cluster_graph(
+        graph,
+        max_cluster_size=config.max_cluster_size,
+        use_lcc=config.use_lcc,
+        seed=config.seed,
+    )
+    
+    # Write both communities to debug files
+    with open("debug_app_name_communities.txt", "w") as f:
+        f.write("Cluster Graph - APP Name Strategy:\n")
+        f.write(pprint.pformat(communities_app))
+    
+    with open("debug_general_communities.txt", "w") as f:
+        f.write("Cluster Graph - General Strategy:\n")
+        f.write(pprint.pformat(communities_general))
+    
+    # Return communities based on config strategy
     if config.strategy == ClusterGraphStrategyType.app_name:
-        return cluster_graph_app_name(graph)
+        return communities_app
     else:
-        return cluster_graph(
-            graph,
-            max_cluster_size=config.max_cluster_size,
-            use_lcc=config.use_lcc,
-            seed=config.seed,
-        )
+        return communities_general
 
 def cluster_graph_app_name(
     graph: nx.Graph,
-    application_attr: str = "APPLICATION_NAME",
+    name_prefix: str = "APP -",
 ) -> Communities:
-    """Group nodes into communities based on their APPLICATION_NAME attribute.
+    """Group nodes into communities based on whether their node name starts with 
+    the provided prefix.
 
-    Nodes with the same value for application_attr will be in the same community.
-
-    Parameters
-    ----------
-    graph : nx.Graph
-        The input graph whose nodes should have an attribute defined by application_attr.
-    application_attr : str, optional
-        The node attribute to use for grouping communities, by default "APPLICATION_NAME".
+    Nodes whose names start with name_prefix are grouped together under that community.
+    Nodes that do not have that prefix are grouped into a default community.
 
     Returns
     -------
     Communities
         A list of tuples, each representing a community in the format
-        (level, community_id, parent, list_of_node_ids). Here, level is set to 0 and parent to -1.
+        (level, community_id, parent, list_of_node_ids).
+        Here, level is set to 0 and parent to -1.
     """
     from collections import defaultdict
 
-    # Group nodes by the specified application attribute.
     groups: dict[str, list[str]] = defaultdict(list)
-    for node, data in graph.nodes(data=True):
-        app_value = data.get(application_attr)
-        if app_value is not None:
-            groups[app_value].append(node)
-        else:
-            groups[""].append(node)  # Nodes without the attribute go to a default community
+    for node in graph.nodes:
+        node_name = str(node)
+        if node_name.startswith(name_prefix):
+            groups[node_name].append(node_name)
+        #else:
+        #    groups[""].append(node_name)
 
     results: Communities = []
-    # Enumerate each community group, setting level 0 and parent -1.
-    for community_id, (app_name, nodes) in enumerate(groups.items()):
+    for community_id, (group_key, nodes) in enumerate(groups.items()):
         results.append((0, community_id, -1, nodes))
-
     return results
-
 
 def cluster_graph(
     graph: nx.Graph,

@@ -6,8 +6,9 @@ Given a YAML file that is relevant to this activity and a list of entity types, 
 - entity_name: Name of the entity, capitalized
 - entity_type: One of the following types: [QUOTE_ID,APPLICATION_NAME,CELL,FILTER,CHEMICAL,OPTICS]
 - entity_description: Comprehensive description of the entity's attributes and activities
-- Instructions for QUOTE_ID and APPLICATION_NAME: For the description of these entities, use the Quote_ID, Application_Name and Application_Summary.
-- Instructions for type CHEMICAL: For these chemical stream entities, the entity name should follow this pattern: <Name> - <Type> - <Measurement specification1> - <Measurement specification2>, etc
+- Instructions for QUOTE_ID: the entity name should follow this pattern: QUOTE - <actual quote ID>. For the description, use the Quote_ID, Application_Name and Application_Summary.
+- Instructions for APPLICATION_NAME: the entity name should follow this pattern: APP - <actual application name>. For the description, use the Quote_ID, Application_Name and Application_Summary.
+- Instructions for type CHEMICAL: For these chemical stream entities, the entity name should follow this pattern: CHEM - <Name> - <Type> - <Measurement specification1> - <Measurement specification2>, etc
   Here are how the different chemical characteristics should be translated to form part of the entity names:
     • Type: Measurement -> MEAS
 	  • Type: Matrix -> MATRIX
@@ -27,9 +28,9 @@ Given a YAML file that is relevant to this activity and a list of entity types, 
     • EDC instead of 1,2-Dichloroethane
     • Benzene instead of C6H6    
   Final CHEMICAL type entity name examples:
-    • WATER - MEAS - 0.0006 NOM - 0.01 MAX - 0.01 QUOTE MAX - 1.0 REPEAT
-    • DIMETHYL SULFOXIDE - MATRIX_OR_INT - 10 NOM - 100 MAX
-	  • 1,2-DICHLOROETHANE - MATRIX - 99.9 NOM - 100.0 MAX
+    • CHEM - WATER - MEAS - 0.0006 NOM - 0.01 MAX - 0.01 QUOTE MAX - 1.0 REPEAT
+    • CHEM - DIMETHYL SULFOXIDE - MATRIX_OR_INT - 10 NOM - 100 MAX
+	  • CHEM - 1,2-DICHLOROETHANE - MATRIX - 99.9 NOM - 100.0 MAX
 - Instructions for CELL: form the name using this pattern:  CELL - <Heating_Mode> - <Temperature> ºC - <Lenght> - <Material> - <Window> - <Pressure> P
   Examples:
   • CELL - ELECTRIC - 50 ºC - 2.0 MM - HAST C - SAPPHIRE - ATM P
@@ -37,10 +38,10 @@ Given a YAML file that is relevant to this activity and a list of entity types, 
   Examples:
   • FILT - 3.71 - H2O - REF
   • FILT - 3.71 - REF
-- Instructions for OPTICS: always use this pattern: SRC <Source> - DET <Detector> - LENS <Lens>
+- Instructions for OPTICS: always use this pattern: OPT - SRC <Source> - DET <Detector> - LENS <Lens>
   Examples:
-  • SRC UV - DET UV W/SF - LENS CAF2
-  • SRC IR - DET BAF2 - LENS CAF2
+  • OPT - SRC UV - DET UV W/SF - LENS CAF2
+  • OPT - SRC IR - DET BAF2 - LENS CAF2
 1.1 MANDATORY: Format each entity as ("entity"<|><entity_name><|><entity_type><|><entity_description>)
 
 2. From the entities identified in step 1, identify all pairs of (source_entity, target_entity) that are related to each other (deduct the relationship from the YAML file structure).
@@ -121,13 +122,13 @@ Streams:
     Nominal_Concentration: 0.6
 ------------------
 output:
-("entity"<|>A40545.2-9<|>QUOTE_ID<|>Quote ID A40545.2-9 application_name is Methyl iodide in CO, which is Methyl iodide (0.002% nom, 0.03% max) measurement in a Carbon monoxide (71.5%) matrix with Hydrogen (12.5%), Nitrogen (9.5%), and Carbon dioxide (4.3%) present.)
+("entity"<|>QUOTE - A40545.2-9<|>QUOTE_ID<|>Quote ID A40545.2-9 application_name is Methyl iodide in CO, which is Methyl iodide (0.002% nom, 0.03% max) measurement in a Carbon monoxide (71.5%) matrix with Hydrogen (12.5%), Nitrogen (9.5%), and Carbon dioxide (4.3%) present.)
 ##
-("entity"<|>METHYL IODIDE IN CO<|>APPLICATION_NAME<|>Quote ID A40545.2-9 application_name is Methyl iodide in CO, which is Methyl iodide (0.002% nom, 0.03% max) measurement in a Carbon monoxide (71.5%) matrix with Hydrogen (12.5%), Nitrogen (9.5%), and Carbon dioxide (4.3%) present.)
+("entity"<|>APP - METHYL IODIDE IN CO<|>APPLICATION_NAME<|>Quote ID A40545.2-9 application_name is Methyl iodide in CO, which is Methyl iodide (0.002% nom, 0.03% max) measurement in a Carbon monoxide (71.5%) matrix with Hydrogen (12.5%), Nitrogen (9.5%), and Carbon dioxide (4.3%) present.)
 ##
 ("entity"<|>CELL - ELECTRIC - 50 ºC - 1 M - 316 SS - SAPPHIRE - ATM P<|>CELL<|>A cell with electric heating mode, temperature of 50 degrees Celsius, length 1 M, material 316 SS, window Sapphire, and pressure Atm.)
 ##
-("entity"<|>SRC UV - DET UV W/SF - LENS CAF2<|>OPTICS<|>UV light source, UV detector with SF, and CaF2 lens.)
+("entity"<|>OPT - SRC UV - DET UV W/SF - LENS CAF2<|>OPTICS<|>UV light source, UV detector with SF, and CaF2 lens.)
 ##
 ("entity"<|>FILT - 3.6 - REF<|>FILTER<|>3.6 - Ref is one of the filters used in the filter wheel.)
 ##
@@ -137,47 +138,47 @@ output:
 ##
 ("entity"<|>FILT - 2.55 - MEAS<|>FILTER<|>2.55 - Meas is one of the filters used in the filter wheel.)
 ##
-("entity"<|>CARBON MONOXIDE - MATRIX_OR_INT - 71.5 NOM<|>CHEMICAL<|>Carbon monoxide is a matrix or interferer with nominal concentration of 71.5.)
+("entity"<|>CHEM - CARBON MONOXIDE - MATRIX_OR_INT - 71.5 NOM<|>CHEMICAL<|>Carbon monoxide is a matrix or interferer with nominal concentration of 71.5.)
 ##
-("entity"<|>NITROGEN - MATRIX_OR_INT - 9.5 NOM<|>CHEMICAL<|>Nitrogen is a matrix or interferer with nominal concentration of 9.5.)
+("entity"<|>CHEM - NITROGEN - MATRIX_OR_INT - 9.5 NOM<|>CHEMICAL<|>Nitrogen is a matrix or interferer with nominal concentration of 9.5.)
 ##
-("entity"<|>CARBON DIOXIDE - MATRIX_OR_INT - 4.3 NOM<|>CHEMICAL<|>Carbon dioxide is a matrix or interferer with nominal concentration of 4.3.)
+("entity"<|>CHEM - CARBON DIOXIDE - MATRIX_OR_INT - 4.3 NOM<|>CHEMICAL<|>Carbon dioxide is a matrix or interferer with nominal concentration of 4.3.)
 ##
-("entity"<|>METHYL IODIDE - MEAS - 0.002 NOM - 0.03 QUOTE MAX<|>CHEMICAL<|>Methyl iodide is a measurement chemical with a nominal concentration of 0.002 and quoted max measurement concentration of 0.03.)
+("entity"<|>CHEM - METHYL IODIDE - MEAS - 0.002 NOM - 0.03 QUOTE MAX<|>CHEMICAL<|>Methyl iodide is a measurement chemical with a nominal concentration of 0.002 and quoted max measurement concentration of 0.03.)
 ##
-("entity"<|>HYDROGEN - MATRIX_OR_INT - 12.5 NOM<|>CHEMICAL<|>Hydrogen is a matrix or interferer with nominal concentration of 12.5.)
+("entity"<|>CHEM - HYDROGEN - MATRIX_OR_INT - 12.5 NOM<|>CHEMICAL<|>Hydrogen is a matrix or interferer with nominal concentration of 12.5.)
 ##
-("entity"<|>METHANE - MATRIX_OR_INT - 0.6 NOM<|>CHEMICAL<|>Methane is a matrix or interferer with nominal concentration of 0.6.)
+("entity"<|>CHEM - METHANE - MATRIX_OR_INT - 0.6 NOM<|>CHEMICAL<|>Methane is a matrix or interferer with nominal concentration of 0.6.)
 ##
-("relationship"<|>FILT - 3.6 - REF<|>A40545.2-9<|>The filter 3.6 - Ref is specified in the A40545.2-9 quote<|>8)
+("relationship"<|>FILT - 3.6 - REF<|>QUOTE - A40545.2-9<|>The filter 3.6 - Ref is specified in the A40545.2-9 quote<|>8)
 ##
-("relationship"<|>FILT - 2.55 - CH3I - MEAS<|>A40545.2-9<|>The filter 2.55 - CH3I - Meas is specified in the A40545.2-9 quote<|>8)
+("relationship"<|>FILT - 2.55 - CH3I - MEAS<|>QUOTE - A40545.2-9<|>The filter 2.55 - CH3I - Meas is specified in the A40545.2-9 quote<|>8)
 ##
-("relationship"<|>FILT - 3.6 - MEAS<|>A40545.2-9<|>The filter 3.6 - Meas is specified in the A40545.2-9 quote<|>8)
+("relationship"<|>FILT - 3.6 - MEAS<|>QUOTE - A40545.2-9<|>The filter 3.6 - Meas is specified in the A40545.2-9 quote<|>8)
 ##
-("relationship"<|>FILT - 2.55 - MEAS<|>A40545.2-9<|>The filter 2.55 - Meas is specified in the A40545.2-9 quote<|>8)
+("relationship"<|>FILT - 2.55 - MEAS<|>QUOTE - A40545.2-9<|>The filter 2.55 - Meas is specified in the A40545.2-9 quote<|>8)
 ##
-("relationship"<|>CELL - ELECTRIC - 50 ºC - 1 M - 316 SS - SAPPHIRE - ATM P<|>A40545.2-9<|>The cell is specified in the A40545.2-9 quote<|>5)
+("relationship"<|>CELL - ELECTRIC - 50 ºC - 1 M - 316 SS - SAPPHIRE - ATM P<|>QUOTE - A40545.2-9<|>The cell is specified in the A40545.2-9 quote<|>5)
 ##
-("relationship"<|>SRC UV - DET UV W/SF - LENS CAF2<|>A40545.2-9<|>The A40545.2-9 quote specifies a UV light source, UV detector with SF, and CaF2 lens<|>5)
+("relationship"<|>OPT - SRC UV - DET UV W/SF - LENS CAF2<|>QUOTE - A40545.2-9<|>The A40545.2-9 quote specifies a UV light source, UV detector with SF, and CaF2 lens<|>5)
 ##
-("relationship"<|>METHYL IODIDE IN CO<|>A40545.2-9<|>This application name is Methyl iodide in CO for A40545.2-9 quote<|>10)
+("relationship"<|>APP - METHYL IODIDE IN CO<|>QUOTE - A40545.2-9<|>This application name is Methyl iodide in CO for A40545.2-9 quote<|>10)
 ##
-("relationship"<|>METHYL IODIDE - MEAS - 0.002 NOM - 0.03 QUOTE MAX<|>A40545.2-9<|>Methyl iodide is a measurement component in the A40545.2-9 quote<|>10)
+("relationship"<|>CHEM - METHYL IODIDE - MEAS - 0.002 NOM - 0.03 QUOTE MAX<|>QUOTE - A40545.2-9<|>Methyl iodide is a measurement component in the A40545.2-9 quote<|>10)
 ##
-("relationship"<|>CARBON MONOXIDE - MATRIX_OR_INT - 71.5 NOM<|>A40545.2-9<|>Carbon monoxide is a matrix or interferer in the A40545.2-9 quote<|>7)
+("relationship"<|>CHEM - CARBON MONOXIDE - MATRIX_OR_INT - 71.5 NOM<|>QUOTE - A40545.2-9<|>Carbon monoxide is a matrix or interferer in the A40545.2-9 quote<|>7)
 ##
-("relationship"<|>NITROGEN - MATRIX_OR_INT - 9.5 NOM<|>A40545.2-9<|>Nitrogen is a matrix or interferer in the A40545.2-9 quote<|>7)
+("relationship"<|>CHEM - NITROGEN - MATRIX_OR_INT - 9.5 NOM<|>QUOTE - A40545.2-9<|>Nitrogen is a matrix or interferer in the A40545.2-9 quote<|>7)
 ##
-("relationship"<|>CARBON DIOXIDE - MATRIX_OR_INT - 4.3 NOM<|>A40545.2-9<|>Carbon dioxide is a matrix or interferer in the A40545.2-9 quote<|>7)
+("relationship"<|>CHEM - CARBON DIOXIDE - MATRIX_OR_INT - 4.3 NOM<|>QUOTE - A40545.2-9<|>Carbon dioxide is a matrix or interferer in the A40545.2-9 quote<|>7)
 ##
-("relationship"<|>HYDROGEN - MATRIX_OR_INT - 12.5 NOM<|>A40545.2-9<|>Hydrogen is a matrix or interferer in the A40545.2-9 quote<|>7)
+("relationship"<|>CHEM - HYDROGEN - MATRIX_OR_INT - 12.5 NOM<|>QUOTE - A40545.2-9<|>Hydrogen is a matrix or interferer in the A40545.2-9 quote<|>7)
 ##
-("relationship"<|>METHANE - MATRIX_OR_INT - 0.6 NOM<|>A40545.2-9<|>Methane is a matrix or interferer in the A40545.2-9 quote<|>7)
+("relationship"<|>CHEM - METHANE - MATRIX_OR_INT - 0.6 NOM<|>QUOTE - A40545.2-9<|>Methane is a matrix or interferer in the A40545.2-9 quote<|>7)
 ##
-("relationship"<|>FILT - 2.55 - CH3I - MEAS<|>METHYL IODIDE - MEAS - 0.002 NOM - 0.03 QUOTE MAX<|>The filter 2.55 - CH3I - Meas is used to measure methyl iodide<|>10)
+("relationship"<|>FILT - 2.55 - CH3I - MEAS<|>CHEM - METHYL IODIDE - MEAS - 0.002 NOM - 0.03 QUOTE MAX<|>The filter 2.55 - CH3I - Meas is used to measure methyl iodide<|>10)
 ##
-("relationship"<|>FILT - 2.55 - MEAS<|>METHYL IODIDE - MEAS - 0.002 NOM - 0.03 QUOTE MAX<|>The filter 2.55 - Meas may also be used to measure methyl iodide<|>8)
+("relationship"<|>FILT - 2.55 - MEAS<|>CHEM - METHYL IODIDE - MEAS - 0.002 NOM - 0.03 QUOTE MAX<|>The filter 2.55 - Meas may also be used to measure methyl iodide<|>8)
 ##
 <|COMPLETE|>
 -------------------
@@ -250,13 +251,13 @@ Streams:
     Nominal_Concentration: 0.3
 ------------------
 output:
-("entity"<|>B68700.1-2<|>QUOTE_ID<|>Quote ID B68700.1-2 application_name is CO in Propylene, which is CO (3.3% nom, 15.0% max) measurement in a Propylene (43.3% nom), Propane(15.4% nom) and Methane (11.2% nom) matrix with Water (0.3% nom) compensation.)
+("entity"<|>QUOTE - B68700.1-2<|>QUOTE_ID<|>Quote ID B68700.1-2 application_name is CO in Propylene, which is CO (3.3% nom, 15.0% max) measurement in a Propylene (43.3% nom), Propane(15.4% nom) and Methane (11.2% nom) matrix with Water (0.3% nom) compensation.)
 ##
-("entity"<|>CO IN PROPYLENE<|>APPLICATION_NAME<|>Quote ID B68700.1-2 application_name is CO in Propylene, which is CO (3.3% nom, 15.0% max) measurement in a Propylene (43.3% nom), Propane(15.4% nom) and Methane (11.2% nom) matrix with Water (0.3% nom) compensation.)
+("entity"<|>APP - CO IN PROPYLENE<|>APPLICATION_NAME<|>Quote ID B68700.1-2 application_name is CO in Propylene, which is CO (3.3% nom, 15.0% max) measurement in a Propylene (43.3% nom), Propane(15.4% nom) and Methane (11.2% nom) matrix with Water (0.3% nom) compensation.)
 ##
 ("entity"<|>CELL - ELECTRIC - 80 ºC - 128.0 MM - 316 SS - CAF2 - RETURN P<|>CELL<|>A cell with electric heating mode, temperature of 80 degrees Celsius, length 128.0 mm, material 316 SS, window CaF2, and pressure Return.)
 ##
-("entity"<|>SRC IR - DET BAF2 - LENS CAF2<|>OPTICS<|>IR light source, BAF2 detector, and CaF2 lens.)
+("entity"<|>OPT - SRC IR - DET BAF2 - LENS CAF2<|>OPTICS<|>IR light source, BAF2 detector, and CaF2 lens.)
 ##
 ("entity"<|>FILT - 4.05 - REF<|>FILTER<|>4.05 - Ref is one of the filters used in the filter wheel.)
 ##
@@ -266,45 +267,45 @@ output:
 ##
 ("entity"<|>FILT - 6.4 - WATER - COMP<|>FILTER<|>6.4 - Water Comp is one of the filters used in the filter wheel.)
 ##
-("entity"<|>CARBON DIOXIDE - MATRIX_OR_INT - 0.2 NOM<|>CHEMICAL<|>Carbon dioxide is a matrix or interferer with nominal concentration of 0.2.)
+("entity"<|>CHEM - CARBON DIOXIDE - MATRIX_OR_INT - 0.2 NOM<|>CHEMICAL<|>Carbon dioxide is a matrix or interferer with nominal concentration of 0.2.)
 ##
-("entity"<|>CARBON MONOXIDE - MEAS - 3.3 NOM - 15.0 QUOTE MAX<|>CHEMICAL<|>Carbon monoxide is a measurement chemical with a nominal concentration of 3.3 and quoted max measurement concentration of 15.0.)
+("entity"<|>CHEM - CARBON MONOXIDE - MEAS - 3.3 NOM - 15.0 QUOTE MAX<|>CHEMICAL<|>Carbon monoxide is a measurement chemical with a nominal concentration of 3.3 and quoted max measurement concentration of 15.0.)
 ##
-("entity"<|>1-BUTANAL - MATRIX_OR_INT - 1.0 NOM<|>CHEMICAL<|>1-Butanal is a matrix or interferer with nominal concentration of 1.0.)
+("entity"<|>CHEM - 1-BUTANAL - MATRIX_OR_INT - 1.0 NOM<|>CHEMICAL<|>1-Butanal is a matrix or interferer with nominal concentration of 1.0.)
 ##
-("entity"<|>PROPYLENE - MATRIX_OR_INT - 43.3 NOM<|>CHEMICAL<|>Propylene is a matrix or interferer with nominal concentration of 43.3.)
+("entity"<|>CHEM - PROPYLENE - MATRIX_OR_INT - 43.3 NOM<|>CHEMICAL<|>Propylene is a matrix or interferer with nominal concentration of 43.3.)
 ##
-("entity"<|>WATER - MATRIX_OR_INT - 0.3 NOM<|>CHEMICAL<|>Water is a matrix or interferer with nominal concentration of 0.3.)
+("entity"<|>CHEM - WATER - MATRIX_OR_INT - 0.3 NOM<|>CHEMICAL<|>Water is a matrix or interferer with nominal concentration of 0.3.)
 ##
-("relationship"<|>FILT - 4.05 - REF<|>B68700.1-2<|>The filter 4.05 - Ref is specified in the B68700.1-2 quote<|>8)
+("relationship"<|>FILT - 4.05 - REF<|>QUOTE - B68700.1-2<|>The filter 4.05 - Ref is specified in the B68700.1-2 quote<|>8)
 ##
-("relationship"<|>FILT - 4.68 - CO - MEAS<|>B68700.1-2<|>The filter 4.68 - CO Meas is specified in the B68700.1-2 quote<|>8)
+("relationship"<|>FILT - 4.68 - CO - MEAS<|>QUOTE - B68700.1-2<|>The filter 4.68 - CO Meas is specified in the B68700.1-2 quote<|>8)
 ##
-("relationship"<|>FILT - 6.3 - PROPYLENE - MEAS<|>B68700.1-2<|>The filter 6.3 - Propylene Meas is specified in the B68700.1-2 quote<|>8)
+("relationship"<|>FILT - 6.3 - PROPYLENE - MEAS<|>QUOTE - B68700.1-2<|>The filter 6.3 - Propylene Meas is specified in the B68700.1-2 quote<|>8)
 ##
-("relationship"<|>FILT - 6.4 - WATER - COMP<|>B68700.1-2<|>The filter 6.4 - Water Comp is specified in the B68700.1-2 quote<|>8)
+("relationship"<|>FILT - 6.4 - WATER - COMP<|>QUOTE - B68700.1-2<|>The filter 6.4 - Water Comp is specified in the B68700.1-2 quote<|>8)
 ##
-("relationship"<|>CELL - ELECTRIC - 80 ºC - 128.0 MM - 316 SS - CAF2 - RETURN P<|>B68700.1-2<|>The cell is specified in the B68700.1-2 quote<|>5)
+("relationship"<|>CELL - ELECTRIC - 80 ºC - 128.0 MM - 316 SS - CAF2 - RETURN P<|>QUOTE - B68700.1-2<|>The cell is specified in the B68700.1-2 quote<|>5)
 ##
-("relationship"<|>SRC IR - DET BAF2 - LENS CAF2<|>A40545.2-9<|>The A40545.2-9 quote specifies an IR light source, BAF2 detector, and CaF2 lens.<|>5)
+("relationship"<|>OPT - SRC IR - DET BAF2 - LENS CAF2<|>QUOTE - A40545.2-9<|>The A40545.2-9 quote specifies an IR light source, BAF2 detector, and CaF2 lens.<|>5)
 ##
-("relationship"<|>CO IN PROPYLENE<|>B68700.1-2<|>This application name is CO in Propylene for the B68700.1-2 quote<|>10)
+("relationship"<|>APP - CO IN PROPYLENE<|>QUOTE - B68700.1-2<|>This application name is CO in Propylene for the B68700.1-2 quote<|>10)
 ##
-("relationship"<|>CARBON MONOXIDE - MEAS - 3.3 NOM - 15.0 QUOTE MAX<|>B68700.1-2<|>Carbon monoxide is a measurement component in the B68700.1-2 quote<|>10)
+("relationship"<|>CHEM - CARBON MONOXIDE - MEAS - 3.3 NOM - 15.0 QUOTE MAX<|>QUOTE - B68700.1-2<|>Carbon monoxide is a measurement component in the B68700.1-2 quote<|>10)
 ##
-("relationship"<|>CARBON DIOXIDE - MATRIX_OR_INT - 0.2 NOM<|>B68700.1-2<|>Carbon dioxide is a matrix or interferer in the B68700.1-2 quote<|>7)
+("relationship"<|>CHEM - CARBON DIOXIDE - MATRIX_OR_INT - 0.2 NOM<|>QUOTE - B68700.1-2<|>Carbon dioxide is a matrix or interferer in the B68700.1-2 quote<|>7)
 ##
-("relationship"<|>1-BUTANAL - MATRIX_OR_INT - 1.0 NOM<|>B68700.1-2<|>1-Butanal is a matrix or interferer in the B68700.1-2 quote<|>7)
+("relationship"<|>CHEM - 1-BUTANAL - MATRIX_OR_INT - 1.0 NOM<|>QUOTE - B68700.1-2<|>1-Butanal is a matrix or interferer in the B68700.1-2 quote<|>7)
 ##
-("relationship"<|>PROPYLENE - MATRIX_OR_INT - 43.3 NOM<|>B68700.1-2<|>Propylene is a matrix or interferer in the B68700.1-2 quote<|>7)
+("relationship"<|>CHEM - PROPYLENE - MATRIX_OR_INT - 43.3 NOM<|>QUOTE - B68700.1-2<|>Propylene is a matrix or interferer in the B68700.1-2 quote<|>7)
 ##
-("relationship"<|>WATER - MATRIX_OR_INT - 0.3 NOM<|>B68700.1-2<|>Water is a matrix or interferer in the B68700.1-2 quote<|>7)
+("relationship"<|>CHEM - WATER - MATRIX_OR_INT - 0.3 NOM<|>QUOTE - B68700.1-2<|>Water is a matrix or interferer in the B68700.1-2 quote<|>7)
 ##
-("relationship"<|>FILT - 4.68 - CO - MEAS<|>CARBON MONOXIDE - MEAS - 3.3 NOM - 15.0 QUOTE MAX<|>The filter 4.68 - CO Meas is used to measure carbon monoxide<|>10)
+("relationship"<|>FILT - 4.68 - CO - MEAS<|>CHEM - CARBON MONOXIDE - MEAS - 3.3 NOM - 15.0 QUOTE MAX<|>The filter 4.68 - CO Meas is used to measure carbon monoxide<|>10)
 ##
-("relationship"<|>FILT - 6.3 - PROPYLENE - MEAS<|>PROPYLENE - MATRIX_OR_INT - 43.3 NOM<|>The filter 6.3 - Propylene Meas is used to measure propylene<|>8)
+("relationship"<|>FILT - 6.3 - PROPYLENE - MEAS<|>CHEM - PROPYLENE - MATRIX_OR_INT - 43.3 NOM<|>The filter 6.3 - Propylene Meas is used to measure propylene<|>8)
 ##
-("relationship"<|>FILT - 6.4 - WATER - COMP<|>WATER - MATRIX_OR_INT - 0.3 NOM<|>The filter 6.4 - Water Comp is used to measure water for compensation<|>8)
+("relationship"<|>FILT - 6.4 - WATER - COMP<|>CHEM - WATER - MATRIX_OR_INT - 0.3 NOM<|>The filter 6.4 - Water Comp is used to measure water for compensation<|>8)
 ##
 <|COMPLETE|>
 ######################
