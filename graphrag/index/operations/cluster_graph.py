@@ -82,6 +82,16 @@ def cluster_graph_app_name(graph: nx.Graph) -> Communities:
         elif node_name.startswith("APP"):
             group_key = node_name
             app_groups[group_key].append(node_name)
+        elif node_name.startswith("QUOTE"):
+            # Check if this quote node is connected to any APP node.
+            added_to_app = False
+            for neighbor in graph.neighbors(node):
+                neighbor_name = str(neighbor)
+                if neighbor_name.startswith("APP"):
+                    # Add the quote node to the community of the found APP node.
+                    app_groups[neighbor_name].append(node_name)
+                    added_to_app = True
+                    break            
         else:
             other_nodes.append(node_name)
 
@@ -93,6 +103,7 @@ def cluster_graph_app_name(graph: nx.Graph) -> Communities:
         results.append((0, community_id_counter, -1, nodes))
         community_id_counter += 1
 
+    # Create communities for APP nodes (including attached QUOTE nodes)
     for group_key, nodes in app_groups.items():
         results.append((0, community_id_counter, -1, nodes))
         community_id_counter += 1        
@@ -100,12 +111,18 @@ def cluster_graph_app_name(graph: nx.Graph) -> Communities:
     # For the remaining nodes, run the Leiden clustering algorithm.
     if other_nodes:
         subgraph = graph.subgraph(other_nodes)
-        # Use default parameters for Leiden clustering; these could be made configurable if needed.
-        leiden_communities = cluster_graph(subgraph, max_cluster_size=1000, use_lcc=False, seed=None)
-        # Adjust community ids to ensure uniqueness
-        for level, _, parent, nodes in leiden_communities:
-            results.append((level, community_id_counter, parent, nodes))
-            community_id_counter += 1
+        # Handle subgraphs without edges, which cause hierarchical_leiden to raise EmptyNetworkError.
+        if subgraph.number_of_edges() == 0:
+            for node in subgraph.nodes:
+                results.append((0, community_id_counter, -1, [node]))
+                community_id_counter += 1
+        else:
+            leiden_communities = cluster_graph(
+                subgraph, max_cluster_size=1000, use_lcc=False, seed=None
+            )
+            for level, _, parent, nodes in leiden_communities:
+                results.append((level, community_id_counter, parent, nodes))
+                community_id_counter += 1
 
     return results
 

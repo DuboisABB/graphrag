@@ -16,6 +16,18 @@
 			"envFile": "${workspaceFolder}/mw/.env"					
 		},
 		{
+			"name": "Indexer2",
+			"type": "debugpy",
+			"request": "launch",
+			"module": "poetry",
+			"args": [
+				"poe", "index",
+				"--root", "./mw2"
+			],
+			"cwd": "${workspaceFolder}",
+			"envFile": "${workspaceFolder}/mw2/.env"					
+		},		
+		{
 			"name": "Debug Normalization",
 			"type": "debugpy",
 			"request": "launch",

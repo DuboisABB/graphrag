@@ -1,0 +1,4 @@
+#!/bin/bash
+rm -fr  ~/graphrag/mw2/cache/
+rm -fr  ~/graphrag/mw2/logs/
+rm -fr  ~/graphrag/mw2/output/
