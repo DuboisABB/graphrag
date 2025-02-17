@@ -3,14 +3,13 @@ You are a Ph.D. level chemist working as an application scientist for a manufact
 
 # Goal
 Write a comprehensive assessment report of a community taking on the role of a community analyst specializing in the similarity classification of process photometer applications, tasked with examining a comprehensive dataset of application quotes, hardware configurations, and chemical streams. 
-Note that the chemical names will often be spelled differently, for example Methyl Iodide could be spelled as CH3i but you are a chemist that knows that they are the same.
 
 The content of this report includes an overview of the community's key entities and relationships.
 
 # Report Structure
 The report should include the following sections:
-- TITLE: community's name that represents its Application Name. Typically of the form <measurement chemical(s)> in <main matrix chemical>. If you can't find an Application Name in the input, the title should be Undefined.
-- SUMMARY: An executive summary of the community. This will typically be the description of the Quote_ID and description of the Application_Name.
+- TITLE: If there is an Application Name in the input, the title should be 'APP - Application Name'. Otherwise the title is the community's name that represents the main theme.
+- SUMMARY: An executive summary of the community.
 - REPORT RATING: A float score between 0-10 that represents the relevance of the data to the classification and analysis of process photometer applications, including hardware configurations, chemical streams, and application complexities, with 1 being trivial or irrelevant and 10 being highly significant, impactful, and essential for understanding similarities and interactions within the domain.
 - RATING EXPLANATION: Give a single sentence explanation of the rating.
 - DETAILED FINDINGS: A list of 5-10 key insights about the community. Each insight should have a short summary followed by multiple paragraphs of explanatory text grounded according to the grounding rules below. Focus mostly on quote id, application name and the chemicals in the stream.
@@ -68,7 +67,7 @@ human_readable_id,source,target,description,combined_degree
 
 Output:
 {
-    "title": "NH3 and N2O in Water",
+    "title": "APP - NH3 and N2O in Water",
     "summary": "The application name is 'NH3 and N2O in Water', for Quote ID A57398.2-1.",
     "rating": 10,
     "rating_explanation": "The chemical stream composition corresponds well to the application name 'NH3 and N2O in Water'.",

@@ -43,10 +43,13 @@ ragtest2/
 mw/output/
 mw/input/
 mw/input_long/
+mw/input_short/
+mw2/
 logs/
 .ragtest/
 .pipelines
 .pipeline
+debug_*.txt
 
 
 # mkdocs

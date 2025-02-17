@@ -6,10 +6,12 @@
 import logging
 import pprint
 import networkx as nx
+import re
 
 from graphrag.config.enums import ClusterGraphStrategyType
 from graphrag.index.utils.stable_lcc import stable_largest_connected_component
 from graphrag.config.models.cluster_graph_config import ClusterGraphConfig
+from collections import defaultdict
 
 Communities = list[tuple[int, int, int, list[str]]]
 
@@ -49,37 +51,64 @@ def cluster_graph_according_to_config(
     else:
         return communities_general
 
-def cluster_graph_app_name(
-    graph: nx.Graph,
-    name_prefix: str = "APP -",
-) -> Communities:
-    """Group nodes into communities based on whether their node name starts with 
-    the provided prefix.
-
-    Nodes whose names start with name_prefix are grouped together under that community.
-    Nodes that do not have that prefix are grouped into a default community.
-
+def cluster_graph_app_name(graph: nx.Graph) -> Communities:
+    """
+    Group nodes into communities based on additional conditions:
+    
+    - If the node's name starts with "CHEM", use a regex pattern to extract a community name.
+      The pattern matches something like: "CHEM - <any character except dash> - <any character except dash>".
+    - All other nodes are grouped using the Leiden clustering algorithm.
+    
     Returns
     -------
     Communities
-        A list of tuples, each representing a community in the format
-        (level, community_id, parent, list_of_node_ids).
-        Here, level is set to 0 and parent to -1.
+        A list of tuples in the format (level, community_id, parent, list_of_node_ids).
     """
-    from collections import defaultdict
+    chem_groups: dict[str, list[str]] = defaultdict(list)
+    app_groups: dict[str, list[str]] = defaultdict(list)
+    other_nodes: list[str] = []
 
-    groups: dict[str, list[str]] = defaultdict(list)
+    # Partition nodes into CHEM nodes (with regex grouping) and the rest.
     for node in graph.nodes:
         node_name = str(node)
-        if node_name.startswith(name_prefix):
-            groups[node_name].append(node_name)
-        #else:
-        #    groups[""].append(node_name)
+        if node_name.startswith("CHEM"):
+            # Using a regex to match: "CHEM - <anything except dash> - <anything except dash>"
+            m = re.match(r"^(CHEM\s*-\s*[^-]+\s*-\s*[^-]+)", node_name)
+            if m:
+                group_key = m.group(1)
+            else:
+                group_key = "CHEM"
+            chem_groups[group_key].append(node_name)
+        elif node_name.startswith("APP"):
+            group_key = node_name
+            app_groups[group_key].append(node_name)
+        else:
+            other_nodes.append(node_name)
 
     results: Communities = []
-    for community_id, (group_key, nodes) in enumerate(groups.items()):
-        results.append((0, community_id, -1, nodes))
+    community_id_counter = 0
+
+    # Create communities for nodes that start with CHEM
+    for group_key, nodes in chem_groups.items():
+        results.append((0, community_id_counter, -1, nodes))
+        community_id_counter += 1
+
+    for group_key, nodes in app_groups.items():
+        results.append((0, community_id_counter, -1, nodes))
+        community_id_counter += 1        
+
+    # For the remaining nodes, run the Leiden clustering algorithm.
+    if other_nodes:
+        subgraph = graph.subgraph(other_nodes)
+        # Use default parameters for Leiden clustering; these could be made configurable if needed.
+        leiden_communities = cluster_graph(subgraph, max_cluster_size=1000, use_lcc=False, seed=None)
+        # Adjust community ids to ensure uniqueness
+        for level, _, parent, nodes in leiden_communities:
+            results.append((level, community_id_counter, parent, nodes))
+            community_id_counter += 1
+
     return results
+
 
 def cluster_graph(
     graph: nx.Graph,
