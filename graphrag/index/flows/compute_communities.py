@@ -6,13 +6,14 @@
 import pandas as pd
 
 from graphrag.config.models.cluster_graph_config import ClusterGraphConfig
-from graphrag.index.operations.cluster_graph import cluster_graph_according_to_config
+from graphrag.config.models.graph_rag_config import GraphRagConfig
+from graphrag.index.operations.cluster_graph_mw import cluster_graph_according_to_config
 from graphrag.index.operations.create_graph import create_graph
 
 
 def compute_communities(
     base_relationship_edges: pd.DataFrame,
-    config: ClusterGraphConfig
+    config: GraphRagConfig
 ) -> pd.DataFrame:
     """All the steps to create the base entity graph."""
     graph = create_graph(base_relationship_edges)
@@ -25,6 +26,7 @@ def compute_communities(
     #)
 
     communities = cluster_graph_according_to_config(graph, config)
+    print("communities:", communities, type(communities))
 
     base_communities = pd.DataFrame(
         communities, columns=pd.Index(["level", "community", "parent", "title"])

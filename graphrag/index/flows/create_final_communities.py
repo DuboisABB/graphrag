@@ -23,7 +23,7 @@ def create_final_communities(
 
     # aggregate relationships ids for each community
     # these are limited to only those where the source and target are in the same community
-    max_level = base_communities["level"].max()
+    max_level = int(base_communities["level"].max())
     all_grouped = pd.DataFrame(
         columns=["community", "level", "relationship_ids", "text_unit_ids"]  # type: ignore
     )

@@ -118,7 +118,9 @@ community_reports:
 
 cluster_graph:
   strategy: leiden  # options: 'leiden' or 'app_name'
-  max_cluster_size: 100
+  embed_model: default_embedding_model # default_embedding_model or "gbyuvd/ChemEmbed-v01"
+  similarity_threshold: 0.93
+  max_cluster_size: 100  
 
 embed_graph:
   enabled: true # if true, will generate node2vec embeddings for nodes

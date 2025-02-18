@@ -30,11 +30,11 @@ async def run_workflow(
     seed = config.cluster_graph.seed
 
     # Extract the cluster_graph config from the overall configuration
-    cluster_config = config.cluster_graph
+    #cluster_config = config.cluster_graph
 
     base_communities = compute_communities(
         base_relationship_edges,
-        config=cluster_config,
+        config=config,
     )
 
     await write_table_to_storage(base_communities, "base_communities", context.storage)

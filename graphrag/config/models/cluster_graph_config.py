@@ -28,3 +28,11 @@ class ClusterGraphConfig(BaseModel):
         description="The clustering strategy to use: 'leiden' or 'app_name'.",
         default=enums.ClusterGraphStrategyType.leiden,
     )
+    embed_model: str = Field(
+        description="Embedding model for node names embedding (if applicable).",
+        default="default_embedding_model",
+    )
+    similarity_threshold: float = Field(
+        description="The threshold for similarity between nodes.",
+        default=0.9,
+    )    
