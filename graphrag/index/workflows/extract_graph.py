@@ -16,6 +16,8 @@ from graphrag.index.operations.create_graph import create_graph
 from graphrag.index.operations.snapshot_graphml import snapshot_graphml
 from graphrag.utils.storage import load_table_from_storage, write_table_to_storage
 
+from graphrag.index.operations.add_similarity_relationships import add_similarity_relationships
+
 workflow_name = "extract_graph"
 
 
@@ -59,6 +61,17 @@ async def run_workflow(
         summarization_num_threads=summarization_num_threads,
         config=config,
     )
+
+    # Augment relationship edges with similarity relationships.
+    cluster_config = config.cluster_graph
+    base_relationship_edges = await add_similarity_relationships(
+        config=config,
+        entity_nodes=base_entity_nodes,
+        relationship_edges=base_relationship_edges,
+        similarity_threshold=cluster_config.similarity_threshold if hasattr(config, "cluster_graph") else 0.9,
+        callbacks=callbacks,
+        cache=context.cache
+    )    
 
     await write_table_to_storage(
         base_entity_nodes, "base_entity_nodes", context.storage

@@ -12,7 +12,7 @@ The report should include the following sections:
 - SUMMARY: An executive summary of the community.
 - REPORT RATING: A float score between 0-10 that represents the relevance of the data to the classification and analysis of process photometer applications, including hardware configurations, chemical streams, and application complexities, with 1 being trivial or irrelevant and 10 being highly significant, impactful, and essential for understanding similarities and interactions within the domain.
 - RATING EXPLANATION: Give a single sentence explanation of the rating.
-- DETAILED FINDINGS: A list of 5-10 key insights about the community. Each insight should have a short summary followed by multiple paragraphs of explanatory text grounded according to the grounding rules below. Focus mostly on quote id, application name and the chemicals in the stream.
+- DETAILED FINDING: A SINGLE key insight about the community. The insight should have a short summary followed by multiple paragraphs of explanatory text grounded according to the grounding rules below. Focus mostly on quote id, application name and the chemicals in the stream.
 
 Return output as a well-formed JSON-formatted string with the following format. Don't use any unnecessary escape sequences. The output should be a single JSON object that can be parsed by json.loads.
     {
@@ -20,7 +20,7 @@ Return output as a well-formed JSON-formatted string with the following format. 
         "summary": "<executive_summary>",
         "rating": <report_rating>,
         "rating_explanation": "<rating_explanation>",
-        "findings": "[{"summary":"<insight_1_summary>", "explanation": "<insight_1_explanation"}, {"summary":"<insight_2_summary>", "explanation": "<insight_2_explanation"}]"
+        "findings": "[{"summary":"<insight_1_summary>", "explanation": "<insight_1_explanation"}]"
     }
 
 # Grounding Rules
@@ -73,27 +73,10 @@ Output:
     "rating_explanation": "The chemical stream composition corresponds well to the application name 'NH3 and N2O in Water'.",
     "findings": [
         {
-            "summary": "Quote ID: A57398.2-1",
-            "explanation": "The Quote ID is A57398.2-1. [records: Entities (75)]"
-        },        
-        {
-            "summary": "Measurement: N2O and NH3",
-            "explanation": "N2O (0.27% nom, 20.0% max) and NH3 (81.5% nom, 90.0% max) are the main chemical measurements in the stream. [records: Entities (75, 82, 83), Relationships (103, 104)]"
-        },
-        {
-            "summary": "Matrix: Water",
-            "explanation": "Water (11.8%) is the main chemical in the in the stream matrix. [records: Entities (75, 85), Relationships (106)]"
-        },
-        {
-            "summary": "Temperature compensation",
-            "explanation": "The application requires temperature compensation. [records: Entities (75)]"
-        },        
-        {
-            "summary": "Cell: ELECTRIC - 90 ºC - 32.0 MM - 316 SS - CAF2 - ATM P",
-            "explanation": "The sampling cell has electric heating mode, temperature of 90 degrees Celsius, length 32.0 mm, material 316 SS, window CaF2, and pressure Atm. [records: Entities (77), Relationships (100)]"
-        }            
-    ]
-
+            "summary": "NH3 and N2O in Water for Quote A57398.2-1",
+            "explanation": "The application is NH3 and N2O in Water for Quote A57398.2-1, where N2O (0.27% nom, 20.0% max) and NH3 (81.5% nom, 90.0% max) are the main chemical measurements in a Water (11.8%) matrix.[records: Entities (75, 82, 83, 85)], Relationships (103, 104, 106)]"
+        }         
+    ]    
 }
 
 # Real Data

@@ -262,31 +262,24 @@ async def cluster_graph_app_name(
         results.append((0, community_id_counter, -1, nodes))
         community_id_counter += 1
 
-    # For the remaining nodes, use embedding-based clustering.
+    # For remaining nodes, perform clustering using the Leiden algorithm.
     if other_nodes:
-        # Create a DataFrame for the other nodes.
-        # Here we simply use the node name as the text to embed.
-        df_nodes = pd.DataFrame({"id": other_nodes, "text": other_nodes})
-
-        if callbacks is None:
-            callbacks = NoopWorkflowCallbacks()
-
-        # Retrieve embedding strategy.
+        # Create subgraph induced by remaining nodes.
+        subgraph = graph.subgraph(other_nodes)
         cluster_config = config.cluster_graph
-        text_embed_config = get_embedding_settings(config)
-        embedding_strategy = text_embed_config.get("strategy", {})
-        similarity_threshold = cluster_config.similarity_threshold
-
-        communities_embedding = await cluster_graph_embedding(
-            nodes=df_nodes,            
-            strategy=embedding_strategy,
-            cluster_config=cluster_config,
-            similarity_threshold=similarity_threshold,
-            callbacks=callbacks,
-            cache=cache
+        node_id_to_community_map, parent_mapping = _compute_leiden_communities(
+            subgraph,
+            max_cluster_size=cluster_config.max_cluster_size,
+            use_lcc=cluster_config.use_lcc,
+            seed=cluster_config.seed,
         )
-        for level, cid, parent, comp_nodes in communities_embedding:
-            results.append((level, community_id_counter, parent, comp_nodes))
-            community_id_counter += 1
+        # Process result from Leiden.
+        for level in sorted(node_id_to_community_map.keys()):
+            clusters = {}
+            for node_id, com_id in node_id_to_community_map[level].items():
+                clusters.setdefault(com_id, []).append(node_id)
+            for com_id, nodes in clusters.items():
+                results.append((level, community_id_counter, parent_mapping[com_id], nodes))
+                community_id_counter += 1
     
     return results

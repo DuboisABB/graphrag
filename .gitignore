@@ -29,6 +29,7 @@ build.zip
 __pycache__
 
 .pipeline
+*.zip
 
 # Azurite
 temp_azurite/
