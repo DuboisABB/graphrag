@@ -26,7 +26,7 @@ def compute_communities(
     #)
 
     communities = cluster_graph_according_to_config(graph, config)
-    print("communities:", communities, type(communities))
+    #print("communities:", communities, type(communities))
 
     base_communities = pd.DataFrame(
         communities, columns=pd.Index(["level", "community", "parent", "title"])
