@@ -44,6 +44,7 @@ DEFAULT_REDUCE_LLM_PARAMS = {
 }
 
 log = logging.getLogger(__name__)
+search_logger = logging.getLogger("graphrag.search")
 
 
 @dataclass(kw_only=True)
@@ -222,17 +223,20 @@ class GlobalSearch(BaseSearch[GlobalContextBuilder]):
         """Generate answer for a single chunk of community reports."""
         start_time = time.time()
         search_prompt = ""
+        #search_logger.debug("Mapping batch: formatting search prompt with context_data: %s", context_data)
         try:
             search_prompt = self.map_system_prompt.format(context_data=context_data)
             search_messages = [
                 {"role": "system", "content": search_prompt},
                 {"role": "user", "content": query},
             ]
+            search_logger.debug("Sending search messages: %s", search_messages)
             async with self.semaphore:
                 search_response = await self.llm.agenerate(
                     messages=search_messages, streaming=False, **llm_kwargs
                 )
                 log.info("Map response: %s", search_response)
+            search_logger.debug("LLM produced search_response: %s", search_response)
             try:
                 # parse search response json
                 processed_response = self.parse_search_response(search_response)
@@ -240,6 +244,7 @@ class GlobalSearch(BaseSearch[GlobalContextBuilder]):
                 log.warning(
                     "Warning: Error parsing search response json - skipping this batch"
                 )
+                search_logger.warning("Warning: Error parsing search response json - skipping this batch")
                 processed_response = []
 
             return SearchResult(
@@ -307,6 +312,7 @@ class GlobalSearch(BaseSearch[GlobalContextBuilder]):
         try:
             # collect all key points into a single list to prepare for sorting
             key_points = []
+            search_logger.debug("Starting reduce stage with map_responses: %s", map_responses)
             for index, response in enumerate(map_responses):
                 if not isinstance(response.response, list):
                     continue
@@ -380,13 +386,14 @@ class GlobalSearch(BaseSearch[GlobalContextBuilder]):
                 {"role": "system", "content": search_prompt},
                 {"role": "user", "content": query},
             ]
-
+            search_logger.debug("Sending LLM _reduce_response search_messages: %s", search_messages)
             search_response = await self.llm.agenerate(
                 search_messages,
                 streaming=True,
                 callbacks=self.callbacks,  # type: ignore
                 **llm_kwargs,  # type: ignore
             )
+            search_logger.debug("Received LLM _reduce_response: %s", search_response)
             return SearchResult(
                 response=search_response,
                 context_data=text_data,
@@ -416,6 +423,7 @@ class GlobalSearch(BaseSearch[GlobalContextBuilder]):
     ) -> AsyncGenerator[str, None]:
         # collect all key points into a single list to prepare for sorting
         key_points = []
+        search_logger.debug("Starting reduce stage with map_responses: %s", map_responses)
         for index, response in enumerate(map_responses):
             if not isinstance(response.response, list):
                 continue

@@ -9,15 +9,18 @@ from pathlib import Path
 
 import pandas as pd
 
+import logging
+
 import graphrag.api as api
 from graphrag.config.load_config import load_config
 from graphrag.config.models.graph_rag_config import GraphRagConfig
 from graphrag.logger.print_progress import PrintProgressLogger
 from graphrag.storage.factory import StorageFactory
 from graphrag.utils.storage import load_table_from_storage, storage_has_table
+from graphrag.config.logging import enable_search_logging_with_config
 
 logger = PrintProgressLogger("")
-
+search_logger = logging.getLogger("graphrag.search")
 
 def run_global_search(
     config_filepath: Path | None,
@@ -33,11 +36,17 @@ def run_global_search(
 
     Loads index files required for global search and calls the Query API.
     """
+
     root = root_dir.resolve()
     cli_overrides = {}
     if data_dir:
         cli_overrides["output.base_dir"] = str(data_dir)
     config = load_config(root, config_filepath, cli_overrides)
+
+    verbose = True
+    enabled_logging, log_path = enable_search_logging_with_config(config, verbose)
+    search_logger = logging.getLogger("graphrag.search")
+    search_logger.debug("Test writing to debug file")
 
     dataframe_dict = _resolve_output_files(
         config=config,

@@ -41,7 +41,7 @@ class EntityExtractionConfig(BaseModel):
     )
     normalize_threshold: float = Field(
         description="Threshold for entity normalization (if applicable).",
-        default=0.7,
+        default=0.95,
     )    
     normalize_model: str = Field(
         description="Embedding model for entity normalization (if applicable).",

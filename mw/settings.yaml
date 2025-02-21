@@ -120,7 +120,7 @@ cluster_graph:
   strategy: app_name  # options: 'leiden' or 'app_name'
   embed_model: default_embedding_model # default_embedding_model or "gbyuvd/ChemEmbed-v01"
   similarity_threshold: 0.93
-  max_cluster_size: 100  
+  max_cluster_size: 1000  
 
 embed_graph:
   enabled: true # if true, will generate node2vec embeddings for nodes

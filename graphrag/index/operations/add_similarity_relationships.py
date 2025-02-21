@@ -77,8 +77,29 @@ async def add_similarity_relationships(
         for j in range(i + 1, n):
             sim_score = similarity_matrix[i, j]
             if sim_score >= similarity_threshold:
+
+                # Let's add one more check for chemicals to see if they really are related. 
+                # Chemicals with have a node name similar to this:
+                # CHEM - CARBON MONOXIDE - MATRIX_OR_INT - 0.0725 NOM - 0.0775 MAX
+                # or
+                # CHEM - CARBON DIOXIDE - MATRIX_OR_INT - 6.0 NOM
+                # Let's create a regex to extract the NOM concentration value for each node title
+                # Then we'll calculate the difference between the two NOM values.
+                # If greater than 40, then we don't add the edge.
+                # If one of the regex doesn't match, then we'll add the edge anyway.
+                if node_titles[i].startswith("CHEM -") and node_titles[j].startswith("CHEM -"):
+                    import re
+                    pattern = r"- ([\d\.]+) NOM"
+                    match1 = re.search(pattern, node_titles[i])
+                    match2 = re.search(pattern, node_titles[j])
+                    if match1 and match2:
+                        nom1 = float(match1.group(1))
+                        nom2 = float(match2.group(1))
+                        if abs(nom1 - nom2) > 40:
+                            continue                
+            
                 normalized_weight = 5 + ((sim_score - similarity_threshold) / (1 - similarity_threshold)) * 5
-                normalized_weight_int = int(round(normalized_weight))
+                normalized_weight_int = int(round(normalized_weight))                
                 new_edges.append({
                     "source": node_titles[i],
                     "target": node_titles[j],                    
