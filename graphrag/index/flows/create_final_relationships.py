@@ -18,6 +18,8 @@ def create_final_relationships(
     """All the steps to transform final relationships."""
     relationships = base_relationship_edges
 
+    relationships.to_csv("debug_base_relationships.csv", index=False)
+
     graph = create_graph(base_relationship_edges)
     degrees = compute_degree(graph)
 
@@ -29,8 +31,9 @@ def create_final_relationships(
         edge_source_column="source",
         edge_target_column="target",
     )
+    
 
-    return relationships.loc[
+    final_relationships =  relationships.loc[
         :,
         [
             "id",
@@ -43,3 +46,8 @@ def create_final_relationships(
             "text_unit_ids",
         ],
     ]
+
+    # Write the resulting relationships to disk for debugging.
+    final_relationships.to_csv("debug_final_relationships.csv", index=False)
+    
+    return final_relationships

@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import re
 from sklearn.metrics.pairwise import cosine_similarity
 import asyncio
 from uuid import uuid4
@@ -88,7 +89,6 @@ async def add_similarity_relationships(
                 # If greater than 40, then we don't add the edge.
                 # If one of the regex doesn't match, then we'll add the edge anyway.
                 if node_titles[i].startswith("CHEM -") and node_titles[j].startswith("CHEM -"):
-                    import re
                     pattern = r"- ([\d\.]+) NOM"
                     match1 = re.search(pattern, node_titles[i])
                     match2 = re.search(pattern, node_titles[j])
@@ -96,8 +96,21 @@ async def add_similarity_relationships(
                         nom1 = float(match1.group(1))
                         nom2 = float(match2.group(1))
                         if abs(nom1 - nom2) > 40:
-                            continue                
-            
+                            continue
+
+                if node_titles[i].startswith("FILT -") and node_titles[j].startswith("FILT -"):
+                    pattern = r"FILT - ([\d\.]+) -"
+                    match1 = re.search(pattern, node_titles[i])
+                    match2 = re.search(pattern, node_titles[j])
+                    if match1 and match2:
+                        c1 = float(match1.group(1))
+                        c2 = float(match2.group(1))
+                        if abs(c1 - c2) > 0.1:
+                            continue
+                            
+                if node_titles[i].startswith("QUOTE -") or node_titles[j].startswith("QUOTE -")
+                    continue
+
                 normalized_weight = 5 + ((sim_score - similarity_threshold) / (1 - similarity_threshold)) * 5
                 normalized_weight_int = int(round(normalized_weight))                
                 new_edges.append({
