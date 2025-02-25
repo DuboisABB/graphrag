@@ -30,14 +30,13 @@ async def normalize_entities(
     Then extract the nominal concentration using this regex: "CHEM -.+ - ([\d\.]+) NOM"
     The concentration will be in the 0 to 100 range. We want to create 3 groups, with a roughly equal number of chemicals in each group.
     So, we needs to calculate these group boundaries dynamically for each chemical. But we have rules for the boundaries:
-    - Group 1: lower bound: 0, upper bound: <= 10
-    - Group 2: lower bound: >= 5, upper bound: <= 50
+    - Group 1: lower bound: 0, upper bound: <= 1
+    - Group 2: lower bound: >= 1, upper bound: <= 50
     - Group 3: lower bound: >= 30, upper bound: <= 100
     One a boundaries for a given chemical is found, we use it to create 3 groups and assign each chemical node to either of those 3 groups. For example, we could have these 3 groups:
     - CHEM - NITROGEN - MATRIX_OR_INT - (0 to 8.0) NOM
     - CHEM - NITROGEN - MATRIX_OR_INT - (8.0 to 45) NOM
     - CHEM - NITROGEN - MATRIX_OR_INT - (45 to 100) NOM
-    Then we need to fix the relationships to match the new chemical nodes names
 
     Parameters
     ----------
@@ -70,7 +69,6 @@ async def normalize_entities(
     # - remainder: any additional identifier (if available) between the chemical name and concentration.
     base_names = {}
     concentrations = {}
-    remainders = {}
 
     # Define regex patterns.
     base_pattern = re.compile(r"CHEM - (.+?)(?= - \d+\.\d+ NOM)")
@@ -93,14 +91,6 @@ async def normalize_entities(
 
         base_names[idx] = base
         concentrations[idx] = conc
-
-        # Attempt to extract a "remainder" if available.
-        parts = title.split(" - ")
-        # Expecting format like: CHEM - <base> - <identifier> - (<concentration>) NOM.
-        if len(parts) >= 3:
-            remainders[idx] = parts[2].strip()
-        else:
-            remainders[idx] = ""
 
     # Group CHEMICAL entities by their extracted base name.
     from collections import defaultdict
@@ -129,8 +119,8 @@ async def normalize_entities(
             boundary2 = sorted_concs[q2_idx] if n_valid > 1 else 50
 
             # Enforce hard rules:
-            # Group 1: 0 to <= 10, so boundary1 must not be above 10.
-            boundary1 = min(boundary1, 10)
+            # Group 1: 0 to <= 1, so boundary1 must not be above 1.
+            boundary1 = max(min(boundary1, 1), 1)
             # Group 2: lower bound >= 5 and upper bound <= 50; we choose boundary2 clamped between 30 and 50.
             boundary2 = max(min(boundary2, 50), 30)
         else:
@@ -145,11 +135,11 @@ async def normalize_entities(
 
             # Determine the group for this concentration.
             if conc < boundary1:
-                new_title = f"CHEM - {base} - {remainders.get(idx, '')} - (0 to {boundary1}) NOM"
+                new_title = f"CHEM - {base} - (0 to {boundary1}) NOM"
             elif conc < boundary2:
-                new_title = f"CHEM - {base} - {remainders.get(idx, '')} - ({boundary1} to {boundary2}) NOM"
+                new_title = f"CHEM - {base} - ({boundary1} to {boundary2}) NOM"
             else:
-                new_title = f"CHEM - {base} - {remainders.get(idx, '')} - ({boundary2} to 100) NOM"
+                new_title = f"CHEM - {base} - ({boundary2} to 100) NOM"
 
             # Update normalized_df.
             normalized_df.at[idx, "title_normalized"] = new_title.strip(" -")

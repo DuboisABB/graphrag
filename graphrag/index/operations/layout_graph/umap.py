@@ -36,12 +36,15 @@ def run(
     nodes = list(embeddings.keys())
     embedding_vectors = [embeddings[node_id] for node_id in nodes]
 
+    #try:
     for node_id in nodes:
         node = graph.nodes[node_id]
         cluster = node.get("cluster", node.get("community", -1))
         node_clusters.append(cluster)
         size = node.get("degree", node.get("size", 0))
         node_sizes.append(size)
+    #except:
+    #    print('break')
 
     additional_args = {}
     if len(node_clusters) > 0:

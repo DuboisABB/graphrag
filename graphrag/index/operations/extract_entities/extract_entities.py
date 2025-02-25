@@ -139,18 +139,33 @@ async def extract_entities(
 
     entities = _merge_entities(entity_dfs)
     relationships = _merge_relationships(relationship_dfs)
+    relationships.to_csv("debug_base_relationships1.csv", index=False)
 
     normalize_entities_flag = config.entity_extraction.normalize_entities
     normalize_threshold = config.entity_extraction.normalize_threshold
 
     if normalize_entities_flag:
+        # Save a copy of the original title for mapping.
+        original_titles = entities["title"].copy()
+        entities.to_csv("debug_normalize_entities_before.csv", index=False)
         # Integrate entity normalization to combine entities with similar names.
-        entities = await normalize_entities(entities, config, callbacks, cache, normalize_threshold)
+        entities = await normalize_entities(entities)
 
         # Build mapping from the original title to the normalized title.
-        mapping = dict(zip(entities["title"], entities["title_normalized"]))
+        mapping = dict(zip(original_titles, entities["title_normalized"]))
+        mapping_df = pd.DataFrame(list(mapping.items()), columns=["original_title", "normalized_title"])
+        mapping_df.to_csv("debug_normalize_entities_mapping.csv", index=False)
+
+        # Reassign normalized title to the title column.
+        entities["title"] = entities["title_normalized"]
+        # Update relationships to use normalized titles.
         relationships["source"] = relationships["source"].apply(lambda x: mapping.get(x, x))
         relationships["target"] = relationships["target"].apply(lambda x: mapping.get(x, x))
+
+        relationships = relationships.drop_duplicates(subset=["source", "target"])
+        # reindex
+        relationships = relationships.reset_index()
+
 
     return (entities, relationships)
 

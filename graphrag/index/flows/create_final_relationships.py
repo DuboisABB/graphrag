@@ -18,7 +18,7 @@ def create_final_relationships(
     """All the steps to transform final relationships."""
     relationships = base_relationship_edges
 
-    relationships.to_csv("debug_base_relationships.csv", index=False)
+    relationships.to_csv("debug_base_relationships2.csv", index=False)
 
     graph = create_graph(base_relationship_edges)
     degrees = compute_degree(graph)

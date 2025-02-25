@@ -90,7 +90,7 @@ entity_extraction:
   #prompt: "prompts/entity_extraction_original.txt"
   entity_types: [QUOTE_ID,APPLICATION_NAME,APPLICATION_COMPLEXITY,CELL,FILTER,CHEMICAL,OPTICS]
   max_gleanings: 1
-  normalize_entities: false
+  normalize_entities: true
   normalize_threshold: 0.98
   normalize_model: default_embedding_model # default_embedding_model or "gbyuvd/ChemEmbed-v01"
 

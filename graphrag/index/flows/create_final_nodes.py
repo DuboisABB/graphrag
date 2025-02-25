@@ -11,6 +11,7 @@ from graphrag.index.operations.compute_degree import compute_degree
 from graphrag.index.operations.create_graph import create_graph
 from graphrag.index.operations.embed_graph.embed_graph import embed_graph
 from graphrag.index.operations.layout_graph.layout_graph import layout_graph
+from graphrag.index.utils.stable_lcc import normalize_node_names
 
 
 def create_final_nodes(
@@ -23,6 +24,11 @@ def create_final_nodes(
 ) -> pd.DataFrame:
     """All the steps to transform final nodes."""
     graph = create_graph(base_relationship_edges)
+
+    # Normalize the graph's node names to match the normalized entities if required.
+    # This ensures that later lookup of node attributes in embed_graph & layout_graph are aligned.
+    graph = normalize_node_names(graph)
+
     graph_embeddings = None
     if embed_config.enabled:
         graph_embeddings = embed_graph(

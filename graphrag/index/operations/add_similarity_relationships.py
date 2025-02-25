@@ -108,7 +108,7 @@ async def add_similarity_relationships(
                         if abs(c1 - c2) > 0.1:
                             continue
                             
-                if node_titles[i].startswith("QUOTE -") or node_titles[j].startswith("QUOTE -")
+                if node_titles[i].startswith("QUOTE -") or node_titles[j].startswith("QUOTE -"):
                     continue
 
                 normalized_weight = 5 + ((sim_score - similarity_threshold) / (1 - similarity_threshold)) * 5
