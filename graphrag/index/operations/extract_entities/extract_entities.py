@@ -147,9 +147,19 @@ async def extract_entities(
     if normalize_entities_flag:
         # Save a copy of the original title for mapping.
         original_titles = entities["title"].copy()
+        missing_titles = original_titles[original_titles.isna()]
+        if not missing_titles.empty:
+            log.error("Missing title entries detected in entities before normalization: %s", missing_titles)
+            print('break')
         entities.to_csv("debug_normalize_entities_before.csv", index=False)
         # Integrate entity normalization to combine entities with similar names.
         entities = await normalize_entities(entities)
+
+        # Debug: log any rows that did not get normalized (NaN in 'title_normalized')
+        nan_rows = entities[entities["title_normalized"].isna()]
+        if not nan_rows.empty:
+            log.error("Normalization failed for the following entities: %s", nan_rows)
+            print('break')
 
         # Build mapping from the original title to the normalized title.
         mapping = dict(zip(original_titles, entities["title_normalized"]))
@@ -164,7 +174,7 @@ async def extract_entities(
 
         relationships = relationships.drop_duplicates(subset=["source", "target"])
         # reindex
-        relationships = relationships.reset_index()
+        relationships = relationships.reset_index(drop=True)
 
 
     return (entities, relationships)
