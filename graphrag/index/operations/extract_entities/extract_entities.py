@@ -177,7 +177,53 @@ async def extract_entities(
         relationships = relationships.reset_index(drop=True)
 
 
+    entities, relationships = _filter_invalid_entities(entities, relationships)
+
     return (entities, relationships)
+
+
+def _filter_invalid_entities(entities: pd.DataFrame, relationships: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Filter out entities with empty types and their relationships.
+    
+    Args:
+        entities: DataFrame containing the entities
+        relationships: DataFrame containing the relationships
+    
+    Returns:
+        tuple: (filtered_entities, filtered_relationships)
+    """
+    original_entity_count = len(entities)
+    original_relationship_count = len(relationships)
+    
+    # Filter out entities with empty type
+    entities_with_empty_type = entities[entities["type"].isna() | (entities["type"] == "")]
+    
+    if not entities_with_empty_type.empty:
+        # Get the titles of invalid entities
+        invalid_entity_titles = set(entities_with_empty_type["title"])
+        log.warning(f"Removing {len(invalid_entity_titles)} entities with empty type")
+        
+        # Remove the invalid entities
+        filtered_entities = entities[~entities["title"].isin(invalid_entity_titles)]
+        
+        # Remove relationships that have invalid entities as source or target
+        filtered_relationships = relationships[
+            ~relationships["source"].isin(invalid_entity_titles) & 
+            ~relationships["target"].isin(invalid_entity_titles)
+        ]
+        
+        # Log the changes
+        log.info(f"Removed {original_entity_count - len(filtered_entities)} entities with empty type")
+        log.info(f"Removed {original_relationship_count - len(filtered_relationships)} relationships associated with invalid entities")
+        
+        # Write filtered entities to debug file for inspection
+        filtered_entities.to_csv("debug_filtered_entities.csv", index=False)
+        filtered_relationships.to_csv("debug_filtered_relationships.csv", index=False)
+        
+        return filtered_entities, filtered_relationships
+    
+    return entities, relationships
 
 
 def _load_strategy(strategy_type: ExtractEntityStrategyType) -> EntityExtractStrategy:
