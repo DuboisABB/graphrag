@@ -9,18 +9,18 @@ models:
     api_key: ${GRAPHRAG_API_KEY} # set this in the generated .env file
     type: azure_openai_chat # or azure_openai_chat
     auth_type: api_key # or azure_managed_identity
-    model: gpt-4o-mini
+    model: gpt-4o
     model_supports_json: true # recommended if this is available for your model.
     parallelization_num_threads: 50
     parallelization_stagger: 0.3
     async_mode: threaded # or asyncio
     # audience: "https://cognitiveservices.azure.com/.default"
-    api_base: https://cog2-trnz2cbjn4ofs.openai.azure.com/
-    api_version: "2024-08-01-preview"
+    api_base: https://oai-cpa017.openai.azure.com/
+    api_version: "2025-01-01-preview"
     # organization: <organization_id>
-    deployment_name: "gpt-4o-mini"
+    deployment_name: "gpt-4o"
     supports_system: true
-    supports_temperature : true
+    supports_temperature : false
   default_embedding_model:
     api_key: ${GRAPHRAG_API_KEY}
     type: azure_openai_embedding # or azure_openai_embedding
@@ -29,7 +29,7 @@ models:
     parallelization_num_threads: 50
     parallelization_stagger: 0.3
     async_mode: threaded # or asyncio
-    api_base: https://cog2-trnz2cbjn4ofs.openai.azure.com/
+    api_base: https://oai-cpa017.openai.azure.com/
     api_version: "2023-05-15"
     # audience: "https://cognitiveservices.azure.com/.default"
     # organization: <organization_id>
