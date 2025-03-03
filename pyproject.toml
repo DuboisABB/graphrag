@@ -94,6 +94,7 @@ httpx = "^0.28.1"
 
 textblob = "^0.18.0.post0"
 spacy = "^3.8.4"
+sentence-transformers = "^3.4.1"
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.6.9"
 ipykernel = "^6.29.5"

@@ -44,6 +44,18 @@ def _get_workflows_list(
                 "create_final_community_reports",
                 "generate_text_embeddings",
             ]
+        case IndexingMethod.FinalCommunitiesOnly:
+            return [
+                "create_final_communities",
+                *(
+                    ["create_final_covariates"]
+                    if config.claim_extraction.enabled
+                    else []
+                ),
+                "create_final_text_units",                
+                "create_final_community_reports",
+                "generate_text_embeddings",
+            ]            
         case IndexingMethod.Fast:
             return [
                 "create_base_text_units",
