@@ -86,7 +86,7 @@ class CommunityReportsExtractor:
                 model_parameters={"max_tokens": self._max_report_length},
             )
             output = response.parsed_json
-            log.info("Input text: %s, LLM response: %s", input_text, output)            
+            #log.info("Input text: %s, LLM response: %s", input_text, output)            
         except Exception as e:
             log.exception("error generating community report")
             self._on_error(e, traceback.format_exc(), None)

@@ -42,9 +42,7 @@ cache/
 ragtest/
 ragtest2/
 mw/output/
-mw/input/
-mw/input_long/
-mw/input_short/
+mw/input*/
 mw2/
 logs/
 .ragtest/
