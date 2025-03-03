@@ -169,6 +169,8 @@ class IndexingMethod(str, Enum):
     """Traditional GraphRAG indexing, with all graph construction and summarization performed by a language model."""
     Fast = "fast"
     """Fast indexing, using NLP for graph construction and language model for summarization."""
+    FinalCommunitiesOnly = "FinalCommunitiesOnly"
+    """Create final communities only, using a language model to summarize the graph."""
 
 
 class NounPhraseExtractorType(str, Enum):
