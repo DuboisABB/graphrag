@@ -39,6 +39,7 @@ def build_entity_context(
     """Prepare entity data table as context data for system prompt."""
     if len(selected_entities) == 0:
         return "", pd.DataFrame()
+ 
 
     # add headers
     current_context_text = f"-----{context_name}-----" + "\n"

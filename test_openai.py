@@ -1,6 +1,11 @@
-import yaml
 import os
+import yaml
 from openai import AzureOpenAI
+
+#JP Test Issue - needed to add this to access environement variable
+from dotenv import load_dotenv
+
+load_dotenv()  # Load environment variables from .env file
 
 def load_config():
     with open('ragtest/settings.yaml', 'r') as file:

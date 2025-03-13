@@ -413,7 +413,7 @@ async def local_search(
     vector_store_args = {}
     for index, store in config.vector_store.items():
         vector_store_args[index] = store.model_dump()
-    logger.info(f"Vector Store Args: {redact(vector_store_args)}")  # type: ignore # noqa
+    #logger.info(f"Vector Store Args: {redact(vector_store_args)}")  # type: ignore # noqa
 
     description_embedding_store = get_embedding_store(
         config_args=vector_store_args,  # type: ignore
@@ -480,7 +480,7 @@ async def local_search_streaming(
     vector_store_args = {}
     for index, store in config.vector_store.items():
         vector_store_args[index] = store.model_dump()
-    logger.info(f"Vector Store Args: {redact(vector_store_args)}")  # type: ignore # noqa
+    #logger.info(f"Vector Store Args: {redact(vector_store_args)}")  # type: ignore # noqa
 
     description_embedding_store = get_embedding_store(
         config_args=vector_store_args,  # type: ignore
