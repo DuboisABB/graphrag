@@ -38,7 +38,7 @@ models:
 vector_store:
   default_vector_store:
     type: lancedb
-    db_uri: output/lancedb
+    db_uri: ./output/lancedb
     container_name: default
     overwrite: True
 
@@ -113,8 +113,8 @@ claim_extraction:
 community_reports:
   model_id: default_chat_model
   prompt: "prompts/community_report_MW_no_findings.txt"
-  max_length: 2000
-  max_input_length: 8000
+  max_length: 16000
+  max_input_length: 100000
 
 cluster_graph:
   strategy: app_name  # options: 'leiden' or 'app_name'
@@ -137,8 +137,9 @@ snapshots:
 ## The prompt locations are required here, but each search method has a number of optional knobs that can be tuned.
 ## See the config docs: https://microsoft.github.io/graphrag/config/yaml/#query
 
+
 local_search:
-  prompt: "prompts/local_search_system_prompt.txt"
+  prompt: "prompts/local_search_system_prompt_mw.txt"
 
 global_search:
   map_prompt: "prompts/global_search_map_system_prompt.txt"

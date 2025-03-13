@@ -26,7 +26,7 @@ def get_llm(config: GraphRagConfig) -> ChatOpenAI:
         if default_llm_settings.audience
         else "https://cognitiveservices.azure.com/.default"
     )
-    print(f"creating llm client with {llm_debug_info}")  # noqa T201
+    #print(f"creating llm client with {llm_debug_info}")  # noqa T201
     return ChatOpenAI(
         api_key=default_llm_settings.api_key,
         azure_ad_token_provider=(
@@ -61,7 +61,7 @@ def get_text_embedder(config: GraphRagConfig) -> OpenAIEmbedding:
         audience = "https://cognitiveservices.azure.com/.default"
     else:
         audience = embeddings_llm_settings.audience
-    print(f"creating embedding llm client with {llm_debug_info}")  # noqa T201
+    #print(f"creating embedding llm client with {llm_debug_info}")  # noqa T201
     return OpenAIEmbedding(
         api_key=embeddings_llm_settings.api_key,
         azure_ad_token_provider=(

@@ -2,18 +2,26 @@
 	"_comment": "Use this file to configure the graphrag project for debugging. You may create other configuration profiles based on these or select one below to use.",
 	"version": "0.2.0",
 	"configurations": [
-		
+		{
+			"name": "Python Debugger: Current File",
+			"type": "debugpy",
+			"request": "launch",
+			"program": "${file}",
+			"console": "integratedTerminal"
+		},
 		{
 			"name": "Indexer",
 			"type": "debugpy",
 			"request": "launch",
 			"module": "poetry",
 			"args": [
-				"poe", "index",
-				"--root", "./mw"
+				"poe",
+				"index",
+				"--root",
+				"./mw"
 			],
 			"cwd": "${workspaceFolder}",
-			"envFile": "${workspaceFolder}/mw/.env"					
+			"envFile": "${workspaceFolder}/mw/.env"
 		},
 		{
 			"name": "Indexer2",
@@ -21,37 +29,45 @@
 			"request": "launch",
 			"module": "poetry",
 			"args": [
-				"poe", "index",
-				"--root", "./mw2"
+				"poe",
+				"index",
+				"--root",
+				"./mw2"
 			],
 			"cwd": "${workspaceFolder}",
-			"envFile": "${workspaceFolder}/mw2/.env"					
-		},		
+			"envFile": "${workspaceFolder}/mw2/.env"
+		},
 		{
 			"name": "Debug Normalization",
 			"type": "debugpy",
 			"request": "launch",
 			"module": "poetry",
 			"args": [
-				"run", "python",
-				"--m", "graphrag.index.operations.debug_entity_normalization"
+				"run",
+				"python",
+				"--m",
+				"graphrag.index.operations.debug_entity_normalization"
 			],
 			"cwd": "${workspaceFolder}",
-			"envFile": "${workspaceFolder}/mw/.env"					
-		},		
+			"envFile": "${workspaceFolder}/mw/.env"
+		},
 		{
 			"name": "Query",
 			"type": "debugpy",
 			"request": "launch",
 			"module": "poetry",
 			"args": [
-				"poe", "query",
-				"--root", "<path_to_ragtest_root_demo>",
-				"--method", "global",
-				"--query", "What are the top themes in this story",
+				"poe",
+				"query",
+				"--root",
+				"<path_to_ragtest_root_demo>",
+				"--method",
+				"global",
+				"--query",
+				"What are the top themes in this story",
 			]
 			"cwd": "${workspaceFolder}",
-			"envFile": "${workspaceFolder}/mw/.env"			
+			"envFile": "${workspaceFolder}/mw/.env"
 		},
 		{
 			"name": "Prompt Tuning",
@@ -59,7 +75,8 @@
 			"request": "launch",
 			"module": "poetry",
 			"args": [
-				"poe", "prompt-tune",
+				"poe",
+				"prompt-tune",
 				"--config",
 				"<path_to_ragtest_root_demo>/settings.yaml",
 			]
